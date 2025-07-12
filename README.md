@@ -1,0 +1,1 @@
+cli tool to fetch weather 
