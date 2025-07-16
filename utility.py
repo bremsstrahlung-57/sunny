@@ -1,36 +1,53 @@
-import os
 import requests
-from dotenv import load_dotenv
+from configure import get_api_key, get_city_name
 
-load_dotenv()
-api_key = os.getenv("API_KEY")
+api_key = get_api_key()
 
 
 class Weather:
     def __init__(self) -> None:
         pass
 
-    def get_weather_city_json(self, city: str, units: str = "metric"):
+    def get_weather_city_json(self, location: str, units: str = "metric"):
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&units={units}&appid={api_key}"
         try:
-            url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&units={units}&appid={api_key}"
             response = requests.get(url)
+            response.raise_for_status()
             data = response.json()
             return data
 
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 404:
+                return f"404 Error: Place Not Found"
+            else:
+                return f"HTTP Error"
+        except requests.exceptions.ConnectionError as errc:
+            return f"Connection Error"
+        except requests.exceptions.Timeout as errt:
+            return f"Timeout Error"
         except requests.exceptions.RequestException as e:
-            return f"An error occurred: {e}"
+            return f"An unexpected error occurred"
 
-    def fetch_temp(self, city: str, units: str = "metric"):
-        data = self.get_weather_city_json(city, units)
+    def fetch_temp(self, location: str, units: str = "metric"):
+        data = self.get_weather_city_json(location, units)
         temperature = data["main"]["temp"]
         return temperature
 
-    def fetch_humid(self, city: str, units: str = "metric"):
-        data = self.get_weather_city_json(city, units)
+    def fetch_humid(self, location: str, units: str = "metric"):
+        data = self.get_weather_city_json(location, units)
         humidity = data["main"]["humidity"]
         return humidity
 
-    def fetch_desc(self, city: str, units: str = "metric"):
-        data = self.get_weather_city_json(city, units)
+    def fetch_desc(self, location: str, units: str = "metric"):
+        data = self.get_weather_city_json(location, units)
         desc = data["weather"][0]["description"]
         return desc.capitalize()
+
+def spaced_location(location: str):
+    w_location = ""
+    for i in location:
+        if i != " ":
+            w_location += i
+        else:
+            w_location += "%20"
+    return w_location

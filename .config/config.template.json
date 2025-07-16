@@ -1,0 +1,13 @@
+{
+  "api": {
+    "key": "your-api-key"
+  },
+  "defaults": {
+    "location": "Delhi",
+    "units": "metric"
+  },
+  "display": {
+    "show_forecast": false,
+    "days": 5
+  }
+}

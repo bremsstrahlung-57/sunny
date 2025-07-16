@@ -1,3 +1,17 @@
-.venv
-.env
-__pycache__
+# Byte-compiled / optimized files
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+sunny.egg-info/
+
+# User-specific config
+config.json
+
+# Temporary or test files
+dump.txt
+
+# OS-generated files
+.DS_Store
+Thumbs.db
