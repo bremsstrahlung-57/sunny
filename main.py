@@ -1,3 +1,5 @@
+from utility import Weather
+
 import os
 import json
 import requests
@@ -6,45 +8,57 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-api_key = os.getenv("API_KEY")
-api_url = f"http://api.openweathermap.org/data/2.5/forecast?id=524901&appid={api_key}"
 
+API_KEY = os.getenv("API_KEY")
+FORECAST_URL = (
+    f"http://api.openweathermap.org/data/2.5/forecast?id=524901&appid={API_KEY}"
+)
+WEATHER = Weather()
 CITY_NAME = "Delhi"
 COUNTRY_CODE = "IN"
-
-
-def get_weather_by_city(city: str, country: str):
-    try:
-        url = f"http://api.openweathermap.org/data/2.5/weather?q={city},{country}&appid={api_key}&units=metric"
-        response = requests.get(url)
-        data = response.json()
-        return data
-
-    except requests.exceptions.RequestException as e:
-        return f"An error occurred: {e}"
-
-
-weather_delhi = get_weather_by_city(CITY_NAME, COUNTRY_CODE)
-temperature = weather_delhi["main"]["temp"]
-humidity = weather_delhi["main"]["humidity"]
-description = weather_delhi["weather"][0]["description"]
-
-# print(f"{CITY_NAME}")
-# print(f"Temperature: {temperature}°C")
-# print(f"Humidity: {humidity}%")
-# print(f"Description: {description}")
+UNIT = "metric"
+VERSION = "v0.0.1 -a"
 
 parser = argparse.ArgumentParser(description="fetch weather")
 
-parser.add_argument("city", help="city name")
-parser.add_argument("-t", "--temp", help="only temp of the city", action="store_true")
+parser.add_argument("-v", "--version", help="version", action="store_true")
+parser.add_argument("-a", "--about", help="about", action="store_true")
+parser.add_argument("-c", "--city", help="city name")
+parser.add_argument("-t", "--temp", help="fetch temperature", action="store_true")
+parser.add_argument("-y", "--humidity", help="fetch humditity", action="store_true")
+parser.add_argument("-d", "--description", help="description", action="store_true")
+parser.add_argument("-u", "--units", help="units - `metric` or `imperial`")
 
 args = parser.parse_args()
 
-wea = f"{args.city}\n"
+
+if args.city:
+    # weather = WEATHER.get_weather_city_json(args.city, args.units)
+    # json_data = json.dumps(weather, indent=4)
+
+    if args.units:
+        UNIT = args.units
+
+    CITY_NAME = args.city
+    temperature = WEATHER.fetch_temp(CITY_NAME, UNIT)
+    humidity = WEATHER.fetch_humid(CITY_NAME, UNIT)
+    desc = WEATHER.fetch_desc(CITY_NAME, UNIT)
+
+    print(
+        f"City: {CITY_NAME.capitalize()}\nTemp: {temperature}\nHumidity: {humidity}\n{desc.capitalize()}"
+    )
 
 if args.temp:
-    wea += f"\nTemp: {temperature}"
-else:
-    wea += f"{weather_delhi}"
-print(wea)
+    print(f"Temp: {WEATHER.fetch_temp(CITY_NAME, UNIT)}")
+
+if args.humidity:
+    print(f"Humidity: {WEATHER.fetch_humid(CITY_NAME, UNIT)}")
+
+if args.description:
+    print(f"Description: {WEATHER.fetch_desc(CITY_NAME, UNIT)}")
+
+if args.version:
+    print(f"{VERSION}")
+
+if args.about:
+    print(f"sunny - a minimal cli weather tool")
