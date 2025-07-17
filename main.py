@@ -1,14 +1,13 @@
 from utility import Weather
 from configure import get_api_key, get_city_name, get_unit, config_file_location
+from configure import temp_colour, humid_colour, desc_colour, city_colour
 from importlib.metadata import version
 
 import sys
-import json
 import argparse
+from rich import print
 
 WEATHER = Weather()
-
-# FIXME: Location with space in their having error in API calls.
 
 
 def main():
@@ -19,10 +18,10 @@ def main():
     # )
 
     if not API_KEY:
-        print("Error: API key not configured (config.json)")
+        print("[bold red]Error[/bold red]: API key not configured (config.json)")
         sys.exit(1)
 
-    parser = argparse.ArgumentParser(description="fetch weather")
+    parser = argparse.ArgumentParser(description="see weather in cli")
 
     parser.add_argument("-v", "--version", help="version", action="store_true")
     parser.add_argument("-a", "--about", help="about", action="store_true")
@@ -43,7 +42,9 @@ def main():
     city = args.city if args.city else DEFAULT_LOCATION
 
     if not city:
-        print(f"Error: City name not provided {config_file_location}")
+        print(
+            f"[bold red]Error[/bold red]: City name not provided [underline]{config_file_location}[/underline]"
+        )
         sys.exit(1)
 
     if args.version:
@@ -51,7 +52,7 @@ def main():
         return
 
     if args.about:
-        print(f"sunny - a minimal cli weather tool")
+        print(f"[bold yellow]sunny[/bold yellow] - a minimal cli weather tool")
         return
 
     if (args.city and not (args.temp or args.humidity or args.description)) or len(
@@ -69,21 +70,31 @@ def main():
             temperature = weather["main"]["temp"]
             humidity = weather["main"]["humidity"]
             desc = weather["weather"][0]["description"]
+
             print(
-                f"City: {DEFAULT_LOCATION.capitalize()}\nTemp: {temperature:.2f} {DEG}\nHumidity: {humidity}\n{desc.capitalize()}"
+                f"[{city_colour()}]City: {DEFAULT_LOCATION.capitalize()}[/{city_colour()}]\n[{temp_colour(temperature)}]Temp: {temperature:.2f} {DEG}[/{temp_colour(temperature)}]\n[{humid_colour(humidity)}]Humidity: {humidity}[/{humid_colour(humidity)}]\n[{desc_colour(weather["weather"][0]["main"])}]{desc.capitalize()}[/{desc_colour(weather["weather"][0]["main"])}]"
             )
         except TypeError:
             print(f"{weather}")
             sys.exit(1)
 
     if args.temp:
-        print(f"Temp: {WEATHER.fetch_temp(DEFAULT_LOCATION, UNIT)} {DEG}")
+        temperature = WEATHER.fetch_temp(DEFAULT_LOCATION, UNIT)
+        print(
+            f"[{temp_colour(temperature)}]Temp:{temperature} {DEG}[/{temp_colour(temperature)}]"
+        )
 
     if args.humidity:
-        print(f"Humidity: {WEATHER.fetch_humid(DEFAULT_LOCATION, UNIT)}")
+        humidity = WEATHER.fetch_humid(DEFAULT_LOCATION, UNIT)
+        print(
+            f"[{humid_colour(humidity)}]Humidity: {humidity}[/{humid_colour(humidity)}]"
+        )
 
     if args.description:
-        print(f"Description: {WEATHER.fetch_desc(DEFAULT_LOCATION, UNIT)}")
+        description = WEATHER.fetch_desc(DEFAULT_LOCATION, UNIT)
+        print(
+            f"[{desc_colour(description)}]Description: {WEATHER.fetch_desc(DEFAULT_LOCATION, UNIT)}[/{desc_colour(description)}]"
+        )
 
 
 if __name__ == "__main__":
