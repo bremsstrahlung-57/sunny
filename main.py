@@ -1,13 +1,25 @@
 from utility import Weather
 from configure import get_api_key, get_city_name, get_unit, config_file_location
-from configure import temp_colour, humid_colour, desc_colour, city_colour
+from configure import (
+    temp_colour,
+    humid_colour,
+    desc_colour,
+    city_colour,
+    wind_colour,
+    emoji,
+)
 from importlib.metadata import version
 
 import sys
 import argparse
-from rich import print
+from rich.console import Console
+from rich import print, box
+from rich.panel import Panel
+from rich.columns import Columns
+
 
 WEATHER = Weather()
+console = Console()
 
 
 def main():
@@ -35,9 +47,11 @@ def main():
 
     UNIT = get_unit()
     DEG = "°C"
+    WIND_SPEED_UNIT = "m/s"
     if args.units:
         UNIT = args.units.lower()
         DEG = "°F" if UNIT == "imperial" else "°C"
+        WIND_SPEED_UNIT = "mi/h" if UNIT == "imperial" else "m/s"
 
     city = args.city if args.city else DEFAULT_LOCATION
 
@@ -68,12 +82,54 @@ def main():
 
         try:
             temperature = weather["main"]["temp"]
+            feels_like_temp = weather["main"]["feels_like"]
             humidity = weather["main"]["humidity"]
             desc = weather["weather"][0]["description"]
+            cond = weather["weather"][0]["main"]
+            wind = weather["wind"]["speed"]
+            ASCII_WEATHER = f"[{desc_colour(cond)}]{emoji(cond, weather["weather"][0]["icon"])}[/{desc_colour(cond)}]"
 
-            print(
-                f"[{city_colour()}]City: {DEFAULT_LOCATION.capitalize()}[/{city_colour()}]\n[{temp_colour(temperature)}]Temp: {temperature:.2f} {DEG}[/{temp_colour(temperature)}]\n[{humid_colour(humidity)}]Humidity: {humidity}[/{humid_colour(humidity)}]\n[{desc_colour(weather["weather"][0]["main"])}]{desc.capitalize()}[/{desc_colour(weather["weather"][0]["main"])}]"
+            content = Columns(
+                [
+                    Panel(
+                        f"[{desc_colour(cond)}]{desc.capitalize()}[/{desc_colour(cond)}]",
+                        box=box.MINIMAL,
+                    ),
+                    Panel(
+                        f"[{temp_colour(temperature)}]Temp: {temperature:.2f}({feels_like_temp:.2f}){DEG}[/{temp_colour(temperature)}]",
+                        box=box.MINIMAL,
+                    ),
+                    Panel(
+                        f"[{humid_colour(humidity)}]Humidity: {humidity}[/{humid_colour(humidity)}]",
+                        box=box.MINIMAL,
+                    ),
+                    Panel(
+                        f"[{wind_colour()}]Wind: {wind}{WIND_SPEED_UNIT}[/{wind_colour()}]",
+                        box=box.MINIMAL,
+                    ),
+                ]
             )
+
+            PANEL = Panel(
+                content,
+                title=f"[{city_colour()}]{DEFAULT_LOCATION.capitalize()}[/{city_colour()}]",
+                border_style=f"bold {city_colour()}",
+                box=box.ROUNDED,
+                padding=(0, 0),
+                width=50,
+                subtitle=f"Coord: {weather["coord"]["lon"], weather["coord"]["lat"]} Country: {weather["sys"]["country"]}",
+            )
+
+            ASCII_PANEL = Panel(
+                ASCII_WEATHER,
+                box=box.MINIMAL,
+                padding=(0, 8),
+                width=50,
+            )
+
+            console.print(ASCII_PANEL)
+            console.print(PANEL)
+
         except TypeError:
             print(f"{weather}")
             sys.exit(1)
@@ -93,7 +149,7 @@ def main():
     if args.description:
         description = WEATHER.fetch_desc(DEFAULT_LOCATION, UNIT)
         print(
-            f"[{desc_colour(description)}]Description: {WEATHER.fetch_desc(DEFAULT_LOCATION, UNIT)}[/{desc_colour(description)}]"
+            f"[{desc_colour(args.description)}]Description: {WEATHER.fetch_desc(DEFAULT_LOCATION, UNIT)}[/{desc_colour(args.description)}]"
         )
 
 

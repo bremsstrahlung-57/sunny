@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 
-
 CONFIG_DIR = Path.cwd() / ".config"
 CONFIG_FILE = CONFIG_DIR / "config.json"
 
@@ -73,20 +72,167 @@ def humid_colour(humidity: int):
             return data["display"]["col_humid"]["low"]
 
 
-def desc_colour(group: str):
+def desc_colour(condition: str):
     with open(CONFIG_FILE, "r") as f:
         data = json.load(f)
-        if group == "Thunderstorm":
+        if condition == "Thunderstorm":
             return data["display"]["col_desc"]["Thunderstorm"]
-        elif group == "Drizzle":
+        elif condition == "Drizzle":
             return data["display"]["col_desc"]["Drizzle"]
-        elif group == "Rain":
+        elif condition == "Rain":
             return data["display"]["col_desc"]["Rain"]
-        elif group == "Snow":
+        elif condition == "Snow":
             return data["display"]["col_desc"]["Snow"]
-        elif group == "Atmosphere":
+        elif condition == "Atmosphere":
             return data["display"]["col_desc"]["Atmosphere"]
-        elif group == "Clear":
+        elif condition == "Clear":
             return data["display"]["col_desc"]["Clear"]
         else:
             return data["display"]["col_desc"]["Clouds"]
+
+
+def emoji(condition: str, icon: str):
+    if condition == "Thunderstorm":
+        return r"""                    
+                #####            
+           ....=########         
+         .......:########        
+        ............-######      
+      ...............*######     
+     ...................*##      
+      .....:+=...........        
+       ...:==+-........          
+           ==                    
+          =="""
+    elif condition == "Drizzle":
+        return r"""       
+              #####           
+         ......*######        
+         .........+#####      
+      .............:*###      
+      ...............         
+        ...#........          
+          #### #              
+            # ##"""
+    elif condition == "Rain":
+        return r"""
+             . =======        
+          .....:+======       
+         ..........+===       
+       .............:++       
+       ...............        
+        ...++........         
+           # ## #             
+            ## #"""
+    elif condition == "Snow":
+        return r"""
+    ...        *                        *       *
+      ...   *         * ..   ...                        *
+ *      ...        *           *            *
+          ...               ...                          *
+            ..                            *
+    *        ..        *                       *
+           __##____              *                      *
+  *    *  /  ##  ****                   *
+         /        ****               *         *  X   *
+   *    /        ******     *                    XXX      *
+       /___________*****          *             XXXXX
+        |            ***               *       XXXXXXX   X
+    *   | ___        |                    *   XXXXXXXX  XXX
+  *     | | |   ___  | *       *             XXXXXXXXXXXXXXX
+        | |_|   | |  ****             *           X   XXXXXXX
+    *********** | | *******      *                X      X
+************************************************************"""
+    elif condition == "Atmosphere":
+        return r"""
+           ######             
+        ##########            
+           #############      
+      #############           
+         #############        
+           ########"""
+    elif condition == "Clear":
+        if icon == "01d":
+            return r"""
+           ========           
+         ============         
+        ==============        
+        ===============       
+        ===============       
+        ==============        
+         ============+        
+           ========+"""
+        else:
+            return r"""         
+           ########           
+         ############         
+        ##############        
+        ###############       
+        ###############       
+        ##############        
+         #############        
+           #########"""
+    elif condition == "Clouds":
+        if icon == "02d":
+            return r"""                             
+                  ==+         
+           ....+========      
+         .......=========     
+         ...........=====     
+      ..............-+===     
+     ..................-      
+     ...................      
+       ................"""
+        elif icon == "02n":
+            return r"""
+                ###         
+           ....#########      
+         .......#########     
+         ..........:#####     
+      ..............+####     
+     ..................=      
+     ...................      
+       ................"""
+        elif icon == "03n":
+            return r"""
+           .....              
+          ........            
+        .............         
+      ..................      
+      ..................      
+       ................."""
+        elif icon == "04n":
+            return r"""
+                ##            
+           .. ######          
+         ......+#######       
+        ..........:######     
+     ..............-######    
+     .................*##     
+     ..................       
+      ................"""
+        else:
+            return r"""
+           .....              
+          ........            
+        .............         
+      ..................      
+      ..................      
+       ................."""
+
+    else:
+        return r"""                             
+                  ==+         
+           ....+========      
+         .......=========     
+         ...........=====     
+      ..............-+===     
+     ..................-      
+     ...................      
+       ................"""
+
+
+def wind_colour():
+    with open(CONFIG_FILE, "r") as f:
+        data = json.load(f)
+        return data["display"]["col_wind"]
