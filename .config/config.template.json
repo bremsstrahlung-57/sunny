@@ -3,7 +3,7 @@
     "key": "your-api-key"
   },
   "defaults": {
-    "location": "Delhi",
+    "location": "New_York",
     "units": "metric"
   },
   "display": {
