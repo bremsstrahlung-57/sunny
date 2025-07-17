@@ -1,5 +1,5 @@
 from utility import Weather
-from configure import get_api_key, get_city_name, config_file_location
+from configure import get_api_key, get_city_name, get_unit, config_file_location
 from importlib.metadata import version
 
 import sys
@@ -7,6 +7,8 @@ import json
 import argparse
 
 WEATHER = Weather()
+
+# FIXME: Location with space in their having error in API calls.
 
 
 def main():
@@ -24,7 +26,7 @@ def main():
 
     parser.add_argument("-v", "--version", help="version", action="store_true")
     parser.add_argument("-a", "--about", help="about", action="store_true")
-    parser.add_argument("-c", "--city", help="city name")
+    parser.add_argument("-c", "--city", help="city name (add '_' if city has space)")
     parser.add_argument("-t", "--temp", help="fetch temperature", action="store_true")
     parser.add_argument("-y", "--humidity", help="fetch humditity", action="store_true")
     parser.add_argument("-d", "--description", help="description", action="store_true")
@@ -32,7 +34,7 @@ def main():
 
     args = parser.parse_args()
 
-    UNIT = "metric"
+    UNIT = get_unit()
     DEG = "°C"
     if args.units:
         UNIT = args.units.lower()
@@ -56,10 +58,12 @@ def main():
         sys.argv
     ) == 1:
         if args.city:
+            if "_" in args.city:
+                args.city = args.city.replace("_", "%20")
             DEFAULT_LOCATION = args.city
 
         weather = WEATHER.get_weather_city_json(DEFAULT_LOCATION, UNIT)
-        # json_data = json.dumps(weather, indent=4)
+        DEFAULT_LOCATION = DEFAULT_LOCATION.replace("%20", " ")
 
         try:
             temperature = weather["main"]["temp"]

@@ -10,6 +10,7 @@ class Weather:
 
     def get_weather_city_json(self, location: str, units: str = "metric"):
         url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&units={units}&appid={api_key}"
+
         try:
             response = requests.get(url)
             response.raise_for_status()
@@ -42,12 +43,4 @@ class Weather:
         data = self.get_weather_city_json(location, units)
         desc = data["weather"][0]["description"]
         return desc.capitalize()
-
-def spaced_location(location: str):
-    w_location = ""
-    for i in location:
-        if i != " ":
-            w_location += i
-        else:
-            w_location += "%20"
-    return w_location
+    

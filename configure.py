@@ -24,6 +24,11 @@ def get_city_name():
     with open(config_file, 'r') as f:
         data = json.load(f)
         return data["defaults"]["location"]
+
+def get_unit():
+    with open(config_file, 'r') as f:
+        data = json.load(f)
+        return data["defaults"]["units"]
     
 def config_file_location():
     return config_file
