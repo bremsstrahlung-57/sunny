@@ -1,6 +1,7 @@
 from utility import Weather
 from configure import ConfigManager
 from importlib.metadata import version
+from themes import show_all_ascii, show_all_themes
 
 import sys
 import argparse
@@ -9,7 +10,6 @@ from rich import print, box
 from rich.panel import Panel
 from rich.columns import Columns
 
-# TODO: Add a flag like --ascii or make ASCII art auto-show by default.
 # TODO: Add a --theme option for different output styles (minimal, detailed, fun, etc.)
 
 
@@ -38,8 +38,20 @@ def main():
     parser.add_argument("-y", "--humidity", help="fetch humditity", action="store_true")
     parser.add_argument("-d", "--description", help="description", action="store_true")
     parser.add_argument("-u", "--units", help="units - `metric` or `imperial`")
+    parser.add_argument(
+        "--ascii", help="Show ascii art of weather condition`", action="store_true"
+    )
+    parser.add_argument(
+        "--showall",
+        help="Show all ascii art of weather conditions`",
+        action="store_true",
+    )
+    parser.add_argument("--theme", help="Shows all theme`", action="store_true")
 
     args = parser.parse_args()
+
+    if args.showall:
+        show_all_ascii()
 
     UNIT = CONFIG.get_unit
     DEG = "°C"
@@ -64,7 +76,7 @@ def main():
     if args.about:
         print(f"[bold yellow]sunny[/bold yellow] - a minimal cli weather tool")
         return
-    
+
     if args.city:
         if "_" in args.city:
             args.city = args.city.replace("_", "%20")
@@ -92,7 +104,7 @@ def main():
                         box=box.MINIMAL,
                     ),
                     Panel(
-                        f"[{CONFIG.temp_colour(temperature)}]Temp: {temperature:.2f}({feels_like_temp:.2f}){DEG}[/{CONFIG.temp_colour(temperature)}]",
+                        f"[{CONFIG.temp_colour(temperature)}]Temp: {temperature:.2f} (Feels: {feels_like_temp:.2f}){DEG}[/{CONFIG.temp_colour(temperature)}]",
                         box=box.MINIMAL,
                     ),
                     Panel(
@@ -100,7 +112,7 @@ def main():
                         box=box.MINIMAL,
                     ),
                     Panel(
-                        f"[{CONFIG.wind_colour()}]Wind: {wind}{WIND_SPEED_UNIT}[/{CONFIG.wind_colour()}]",
+                        f"[{CONFIG.wind_colour}]Wind: {wind}{WIND_SPEED_UNIT}[/{CONFIG.wind_colour}]",
                         box=box.MINIMAL,
                     ),
                 ]
@@ -108,8 +120,8 @@ def main():
 
             PANEL = Panel(
                 content,
-                title=f"[{CONFIG.city_colour()}]{DEFAULT_LOCATION.capitalize()}[/{CONFIG.city_colour()}]",
-                border_style=f"bold {CONFIG.city_colour()}",
+                title=f"[{CONFIG.city_colour}]{DEFAULT_LOCATION.capitalize()}[/{CONFIG.city_colour}]",
+                border_style=f"bold {CONFIG.city_colour}",
                 box=box.ROUNDED,
                 padding=(0, 0),
                 width=50,
@@ -132,22 +144,29 @@ def main():
 
     if args.temp:
         temperature = WEATHER.fetch_temp(DEFAULT_LOCATION, UNIT)
-        print(DEFAULT_LOCATION)
-        print(
-            f"[{CONFIG.temp_colour(temperature)}]Temp:{temperature}{DEG}[/{CONFIG.temp_colour(temperature)}]"
-        )
+        color = CONFIG.temp_colour(temperature)
+        print(f"[{color}]Temp:{temperature}{DEG}[/{color}]")
 
     if args.humidity:
         humidity = WEATHER.fetch_humid(DEFAULT_LOCATION, UNIT)
-        print(
-            f"[{CONFIG.humid_colour(humidity)}]Humidity: {humidity}[/{CONFIG.humid_colour(humidity)}]"
-        )
+        color = CONFIG.humid_colour(humidity)
+        print(f"[{color}]Humidity: {humidity}[/{color}]")
 
     if args.description:
-        description = WEATHER.fetch_desc(DEFAULT_LOCATION, UNIT)
+        description = WEATHER.get_weather_city_json(DEFAULT_LOCATION, UNIT)
+        color = CONFIG.condition_colour(description["weather"][0]["main"])
         print(
-            f"[{CONFIG.condition_colour(args.description)}]{description}[/{CONFIG.condition_colour(args.description)}]"
+            f"[{color}]{(description["weather"][0]["description"]).capitalize()}[/{color}]"
         )
+
+    if args.ascii:
+        ascii = WEATHER.get_weather_city_json(DEFAULT_LOCATION, UNIT)
+        cond = ascii["weather"][0]["main"]
+        color = CONFIG.condition_colour(cond)
+        ascii_art = (
+            f"[{color}]{CONFIG.ascii_art(cond, ascii["weather"][0]["icon"])}[/{color}]"
+        )
+        print(ascii_art)
 
 
 if __name__ == "__main__":

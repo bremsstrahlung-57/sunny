@@ -1,4 +1,4 @@
-import json
+import toml
 import sys
 from pathlib import Path
 
@@ -6,7 +6,7 @@ from pathlib import Path
 class ConfigManager:
     def __init__(self) -> None:
         self.config_dir = Path.cwd() / ".config"
-        self.config_file = self.config_dir / "config.json"
+        self.config_file = self.config_dir / "config.toml"
         self._config_data = None
 
     @property
@@ -18,7 +18,7 @@ class ConfigManager:
     def _load_config(self):
         if self.config_file.exists():
             with open(self.config_file, "r") as f:
-                self._config_data = json.load(f)
+                self._config_data = toml.load(f)
         else:
             print(f"Config file not found: {self.config_file}")
             self._config_data = {}
@@ -55,6 +55,7 @@ class ConfigManager:
             print(f"Default units not found in {self.config_file} file")
             sys.exit(1)
 
+    @property
     def city_colour(self):
         try:
             return self.config.get("display").get("col_city")
@@ -102,7 +103,7 @@ class ConfigManager:
                 return self.config.get("display").get("col_desc").get("Atmosphere")
             elif condition == "Clear":
                 return self.config.get("display").get("col_desc").get("Clear")
-            else:
+            elif condition == "Clouds":
                 return self.config.get("display").get("col_desc").get("Clouds")
         except (KeyError, TypeError):
             print(
@@ -110,6 +111,7 @@ class ConfigManager:
             )
             return "dark_orange"
 
+    @property
     def wind_colour(self):
         try:
             return self.config.get("display").get("col_wind")

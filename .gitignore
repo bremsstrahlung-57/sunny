@@ -1,12 +1,14 @@
 # Byte-compiled / optimized files
 __pycache__/
 *.pyc
+/build
 
 # Virtual environment
 .venv/
 sunny.egg-info/
 
 # User-specific config
+config.toml
 config.json
 
 # Temporary or test files
