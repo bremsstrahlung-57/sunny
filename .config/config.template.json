@@ -26,9 +26,9 @@
       "Rain": "light_steel_blue3",
       "Snow": "bright_white",
       "Atmosphere": "grey53",
-      "Clear": "sky_blue1",
+      "Clear": "dark_orange",
       "Clouds": "orchid"
     },
-    "col_wind": "dark_orange"
+    "col_wind": "sky_blue1"
   }
 }

@@ -1,7 +1,9 @@
 import requests
-from configure import get_api_key
+from configure import ConfigManager
 
-api_key = get_api_key()
+API_CONFIG = ConfigManager()
+
+api_key = API_CONFIG.get_api_key
 
 
 class Weather:
