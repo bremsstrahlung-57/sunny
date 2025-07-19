@@ -1,5 +1,5 @@
 import requests
-from configure import ConfigManager
+from sunny.configure import ConfigManager
 
 API_CONFIG = ConfigManager()
 
@@ -11,6 +11,7 @@ class Weather:
         pass
 
     def get_weather_city_json(self, location: str, units: str = "metric") -> str:
+        """Returns open weather api data of specified location and units"""
         url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&units={units}&appid={api_key}"
 
         try:

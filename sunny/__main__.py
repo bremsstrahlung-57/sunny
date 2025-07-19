@@ -1,7 +1,6 @@
-from utility import Weather
-from configure import ConfigManager
-from importlib.metadata import version
-from themes import show_all_ascii, show_all_themes
+from sunny.utility import Weather
+from sunny.configure import ConfigManager
+from sunny.themes import show_all_ascii, show_all_themes
 
 import sys
 import argparse
@@ -9,6 +8,7 @@ from rich.console import Console
 from rich import print, box
 from rich.panel import Panel
 from rich.columns import Columns
+from importlib.metadata import version
 
 
 WEATHER = Weather()
@@ -77,6 +77,20 @@ def main():
             args.city = args.city.replace("_", "%20")
         DEFAULT_LOCATION = args.city
 
+    if args.ascii:
+        ascii = WEATHER.get_weather_city_json(DEFAULT_LOCATION, UNIT)
+        cond = ascii["weather"][0]["main"]
+        color = CONFIG.condition_colour(cond)
+        ascii_art = (
+            f"[{color}]{CONFIG.ascii_art(cond, ascii["weather"][0]["icon"])}[/{color}]"
+        )
+        print(ascii_art)
+
+    if args.themes:
+        print()
+        show_all_themes()
+        sys.exit(0)
+
     if (args.city and not (args.temp or args.humidity or args.description)) or len(
         sys.argv
     ) == 1:
@@ -99,7 +113,7 @@ def main():
                         box=box.MINIMAL,
                     ),
                     Panel(
-                        f"[{CONFIG.temp_colour(temperature)}]Temp: {temperature:.2f} (Feels: {feels_like_temp:.2f}){DEG}[/{CONFIG.temp_colour(temperature)}]",
+                        f"[{CONFIG.temp_colour(temperature)}]Temp: {temperature:.2f}({feels_like_temp:.2f}) {DEG}[/{CONFIG.temp_colour(temperature)}]",
                         box=box.MINIMAL,
                     ),
                     Panel(
@@ -116,7 +130,7 @@ def main():
             PANEL = Panel(
                 content,
                 title=f"[{CONFIG.city_colour}]{DEFAULT_LOCATION.capitalize()}[/{CONFIG.city_colour}]",
-                border_style=f"{CONFIG.get_panel_attribute('border_style')} {CONFIG.city_colour}",
+                border_style=f"{CONFIG.get_panel_attribute('border_style')} {CONFIG.get_panel_attribute('border_colour')}",
                 box=CONFIG.get_box_style(),
                 padding=(
                     CONFIG.get_panel_attribute("padding_top_right"),
@@ -161,15 +175,6 @@ def main():
         print(
             f"[{color}]{(description["weather"][0]["description"]).capitalize()}[/{color}]"
         )
-
-    if args.ascii:
-        ascii = WEATHER.get_weather_city_json(DEFAULT_LOCATION, UNIT)
-        cond = ascii["weather"][0]["main"]
-        color = CONFIG.condition_colour(cond)
-        ascii_art = (
-            f"[{color}]{CONFIG.ascii_art(cond, ascii["weather"][0]["icon"])}[/{color}]"
-        )
-        print(ascii_art)
 
 
 if __name__ == "__main__":

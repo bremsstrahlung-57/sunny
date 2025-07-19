@@ -1,161 +1,228 @@
 import toml
 import sys
 import os
-import glob
 from pathlib import Path
 
 
 class ConfigManager:
     def __init__(self) -> None:
-        self.config_dir = Path.cwd() / ".config"
+        self.config_dir = Path.cwd() / "sunny" /".config"
         self.config_file = self.config_dir / "config.toml"
         self._config_data = None
-        self.theme_dir = Path.cwd() / ".config" / "themes"
+        self.theme_dir = Path.cwd() / "sunny" / ".config" / "themes"
         self.theme_file = None
         self._theme_data = None
 
-    @property
-    def config(self):
-        if self._config_data is None:
-            self._load_config()
+    def _load_config(self) -> dict:
+        """Load configuration data from file."""
+        if not self.config_file.exists():
+            print(f"Config file not found: {self.config_file}")
+            sys.exit(1)
+        
+        with open(self.config_file, "r") as f:
+            self._config_data = toml.load(f)
         return self._config_data
 
-    def _load_config(self):
-        if self.config_file.exists():
-            with open(self.config_file, "r") as f:
-                self._config_data = toml.load(f)
-        else:
-            print(f"Config file not found: {self.config_file}")
-            self._config_data = {}
-            sys.exit(1)
+    @property
+    def config(self) -> dict:
+        """Get configuration data, loading it if necessary."""
+        if self._config_data is None:
+            self._config_data = self._load_config()
+        return self._config_data if self._config_data is not None else {}
 
     @property
-    def config_file_location(self):
+    def config_file_location(self) -> Path:
+        """Get the configuration file path."""
         return self.config_file
 
-    def get_theme(self):
-        if self._config_data is None:
-            self.config
+    def get_theme(self) -> Path:
+        """Get the theme file path, falling back to sunny_dynamic if needed."""
+        config = self.config
+
         try:
-            defualt_theme = glob.glob(
-                os.path.join(
-                    self.theme_dir,
-                    f"{self._config_data.get("display").get("theme")}.toml",
-                )
-            )
-            self.theme_file = Path(defualt_theme[0])
-            return self.theme_file
+            display_config = config.get("display", {})
+            if not isinstance(display_config, dict):
+                display_config = {}
+            
+            theme_name = display_config.get("theme", "sunny_dynamic")
+            theme_path = os.path.join(self.theme_dir, f"{theme_name}.toml")
+            
+            if os.path.exists(theme_path):
+                self.theme_file = Path(theme_path)
+                return self.theme_file
+            
+            fallback_path = os.path.join(self.theme_dir, "sunny_dynamic.toml")
+            if os.path.exists(fallback_path):
+                if theme_name != "sunny_dynamic":
+                    print(f"Warning: Theme '{theme_name}' not found, falling back to sunny_dynamic")
+                self.theme_file = Path(fallback_path)
+                return self.theme_file
+            
+            raise FileNotFoundError("Neither configured theme nor fallback theme found")
 
         except (FileNotFoundError, AttributeError, KeyError) as e:
             print(f"Error: Theme file not found or inaccessible: {e}")
             sys.exit(1)
-            return None
 
-    @property
-    def theme(self):
-        if self._theme_data is None:
-            self._load_theme()
+    def _load_theme(self) -> dict:
+        """Load theme data from file."""
+        theme_file = self.get_theme()
+        if not theme_file.exists():
+            print(f"Theme file not found: {theme_file}")
+            sys.exit(1)
+            
+        with open(theme_file, "r") as f:
+            self._theme_data = toml.load(f)
         return self._theme_data
 
-    def _load_theme(self):
-        self.get_theme()
-        if self.theme_file.exists():
-            with open(self.theme_file, "r") as f:
-                self._theme_data = toml.load(f)
-        else:
-            print(f"Config file not found: {self.theme_file}")
-            self._theme_data = {}
+    @property
+    def theme(self) -> dict:
+        """Get theme data, loading it if necessary."""
+        if self._theme_data is None:
+            self._theme_data = self._load_theme()
+        return self._theme_data if self._theme_data is not None else {}
+
+    @property
+    def get_api_key(self) -> str:
+        """Get API key from config."""
+        config = self.config
+        try:
+            api_config = config.get("api", {})
+            if not isinstance(api_config, dict):
+                raise KeyError("Invalid API configuration")
+            key = api_config.get("key")
+            if not key:
+                raise KeyError("API key not found")
+            return key
+        except (KeyError, TypeError) as e:
+            print(f"API key not found in {self.config_file} file: {e}")
             sys.exit(1)
 
     @property
-    def get_api_key(self):
+    def get_location(self) -> str:
+        """Get default location from config."""
+        config = self.config
         try:
-            return self.config.get("api").get("key")
-
-        except (KeyError, TypeError):
-            print(f"Key not found in {self.config_file} file")
+            defaults = config.get("defaults", {})
+            if not isinstance(defaults, dict):
+                raise KeyError("Invalid defaults configuration")
+            location = defaults.get("location")
+            if not location:
+                raise KeyError("Default location not found")
+            return location
+        except (KeyError, TypeError) as e:
+            print(f"Default location not found in {self.config_file} file: {e}")
             sys.exit(1)
 
     @property
-    def get_location(self):
+    def get_unit(self) -> str:
+        """Get default units from config."""
+        config = self.config
         try:
-            return self.config.get("defaults").get("location")
-
-        except (KeyError, TypeError):
-            print(f"Default location not found in {self.config_file} file")
+            defaults = config.get("defaults", {})
+            if not isinstance(defaults, dict):
+                raise KeyError("Invalid defaults configuration")
+            units = defaults.get("units")
+            if not units:
+                raise KeyError("Default units not found")
+            return units
+        except (KeyError, TypeError) as e:
+            print(f"Default units not found in {self.config_file} file: {e}")
             sys.exit(1)
 
     @property
-    def get_unit(self):
+    def city_colour(self) -> str:
+        """Get city color from theme."""
+        theme = self.theme
         try:
-            return self.config.get("defaults").get("units")
-
+            colours = theme.get("colours", {})
+            if not isinstance(colours, dict):
+                raise KeyError("Invalid colours configuration")
+            return colours.get("col_city", "light_steel_blue")
         except (KeyError, TypeError):
-            print(f"Default units not found in {self.config_file} file")
-            sys.exit(1)
-
-    @property
-    def city_colour(self):
-        try:
-            return self.theme.get("colours").get("col_city")
-        except (KeyError, TypeError):
-            print(
-                f'No default city colour added in {self.theme_file}. Default colour: "light_steel_blue"'
-            )
+            print(f'No default city colour found in theme. Using default: "light_steel_blue"')
             return "light_steel_blue"
 
-    def temp_colour(self, temperature: float):
+    def temp_colour(self, temperature: float) -> str:
+        """Get temperature color based on value."""
+        theme = self.theme
         try:
+            colours = theme.get("colours", {})
+            if not isinstance(colours, dict):
+                raise KeyError("Invalid colours configuration")
+            temp_colours = colours.get("col_temp", {})
+            if not isinstance(temp_colours, dict):
+                raise KeyError("Invalid temperature colours configuration")
+            
             if temperature > 30:
-                return self.theme.get("colours").get("col_temp").get("high")
+                return temp_colours.get("high", "sandy_brown")
             elif temperature >= 10:
-                return self.theme.get("colours").get("col_temp").get("mid")
+                return temp_colours.get("mid", "chartreuse3")
             else:
-                return self.theme.get("colours").get("col_temp").get("low")
+                return temp_colours.get("low", "deep_sky_blue1")
         except (KeyError, TypeError):
-            print(f"No default temp colour added in {self.theme_file}.")
+            print(f"No temperature colours found in theme. Using default.")
             return "chartreuse3"
 
-    def humid_colour(self, humidity: int):
+    def humid_colour(self, humidity: int) -> str:
+        """Get humidity color based on value."""
+        theme = self.theme
         try:
+            colours = theme.get("colours", {})
+            if not isinstance(colours, dict):
+                raise KeyError("Invalid colours configuration")
+            humid_colours = colours.get("col_humid", {})
+            if not isinstance(humid_colours, dict):
+                raise KeyError("Invalid humidity colours configuration")
+            
             if humidity > 65:
-                return self.theme.get("colours").get("col_humid").get("high")
+                return humid_colours.get("high", "cornflower_blue")
             elif humidity >= 55:
-                return self.theme.get("colours").get("col_humid").get("mid")
+                return humid_colours.get("mid", "green_yellow")
             else:
-                return self.theme.get("colours").get("col_humid").get("low")
+                return humid_colours.get("low", "indian_red")
         except (KeyError, TypeError):
-            print(f"No default humidity colour added in {self.theme_file}.")
+            print(f"No humidity colours found in theme. Using default.")
             return "green_yellow"
 
-    def condition_colour(self, condition: str):
+    def condition_colour(self, condition: str) -> str:
+        """Get weather condition color based on condition type."""
+        theme = self.theme
         try:
-            if condition == "Thunderstorm":
-                return self.theme.get("colours").get("col_desc").get("Thunderstorm")
-            elif condition == "Drizzle":
-                return self.theme.get("colours").get("col_desc").get("Drizzle")
-            elif condition == "Rain":
-                return self.theme.get("colours").get("col_desc").get("Rain")
-            elif condition == "Snow":
-                return self.theme.get("colours").get("col_desc").get("Snow")
-            elif condition == "Atmosphere":
-                return self.theme.get("colours").get("col_desc").get("Atmosphere")
-            elif condition == "Clear":
-                return self.theme.get("colours").get("col_desc").get("Clear")
-            elif condition == "Clouds":
-                return self.theme.get("colours").get("col_desc").get("Clouds")
+            colours = theme.get("colours", {})
+            if not isinstance(colours, dict):
+                raise KeyError("Invalid colours configuration")
+            desc_colours = colours.get("col_desc", {})
+            if not isinstance(desc_colours, dict):
+                raise KeyError("Invalid description colours configuration")
+
+            defaults = {
+                "Thunderstorm": "dodger_blue2",
+                "Drizzle": "deep_sky_blue2",
+                "Rain": "light_steel_blue3",
+                "Snow": "bright_white",
+                "Atmosphere": "grey53",
+                "Clear": "dark_orange",
+                "Clouds": "orchid"
+            }
+            
+            return desc_colours.get(condition, defaults.get(condition, "dark_orange"))
+            
         except (KeyError, TypeError):
-            print(
-                f'No default condition colour ("col_desc") added in {self.theme_file}.'
-            )
+            print(f'No condition colours found in theme. Using default.')
             return "dark_orange"
 
     @property
-    def wind_colour(self):
+    def wind_colour(self) -> str:
+        """Get wind color from theme."""
+        theme = self.theme
         try:
-            return self.theme.get("colours").get("col_wind")
+            colours = theme.get("colours", {})
+            if not isinstance(colours, dict):
+                raise KeyError("Invalid colours configuration")
+            return colours.get("col_wind", "sky_blue1")
         except (KeyError, TypeError):
-            print(f"No default wind colour added in {self.theme_file}.")
+            print(f"No wind colour found in theme. Using default.")
             return "sky_blue1"
 
     def ascii_art(self, condition: str, icon: str):
