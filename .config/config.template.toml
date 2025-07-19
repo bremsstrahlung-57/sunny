@@ -8,25 +8,4 @@ units = "metric"
 [display]
 show_forecast = false
 days = 5
-col_city = "light_steel_blue"
-col_wind = "sky_blue1"
 theme = "sunny_dynamic"
-
-[display.col_temp]
-high = "sandy_brown"
-mid = "chartreuse3"
-low = "deep_sky_blue1"
-
-[display.col_humid]
-high = "cornflower_blue"
-mid = "green_yellow"
-low = "indian_red"
-
-[display.col_desc]
-Thunderstorm = "dodger_blue2"
-Drizzle = "deep_sky_blue2"
-Rain = "light_steel_blue3"
-Snow = "bright_white"
-Atmosphere = "grey53"
-Clear = "dark_orange"
-Clouds = "orchid"

@@ -10,8 +10,6 @@ from rich import print, box
 from rich.panel import Panel
 from rich.columns import Columns
 
-# TODO: Add a --theme option for different output styles (minimal, detailed, fun, etc.)
-
 
 WEATHER = Weather()
 CONSOLE = Console()
@@ -21,9 +19,6 @@ CONFIG = ConfigManager()
 def main():
     API_KEY = CONFIG.get_api_key
     DEFAULT_LOCATION = CONFIG.get_location
-    # FORECAST_URL = (
-    #     f"http://api.openweathermap.org/data/2.5/forecast?id=524901&appid={API_KEY}"
-    # )
 
     if not API_KEY:
         print("[bold red]Error[/bold red]: API key not configured (config.json)")
@@ -46,7 +41,7 @@ def main():
         help="Show all ascii art of weather conditions`",
         action="store_true",
     )
-    parser.add_argument("--theme", help="Shows all theme`", action="store_true")
+    parser.add_argument("--themes", help="Shows all theme`", action="store_true")
 
     args = parser.parse_args()
 
@@ -121,18 +116,26 @@ def main():
             PANEL = Panel(
                 content,
                 title=f"[{CONFIG.city_colour}]{DEFAULT_LOCATION.capitalize()}[/{CONFIG.city_colour}]",
-                border_style=f"bold {CONFIG.city_colour}",
-                box=box.ROUNDED,
-                padding=(0, 0),
-                width=50,
-                subtitle=f"Coord: {weather["coord"]["lon"], weather["coord"]["lat"]} Country: {weather["sys"]["country"]}",
+                border_style=f"{CONFIG.get_panel_attribute('border_style')} {CONFIG.city_colour}",
+                box=CONFIG.get_box_style(),
+                padding=(
+                    CONFIG.get_panel_attribute("padding_top_right"),
+                    CONFIG.get_panel_attribute("padding_bottom_left"),
+                ),
+                width=CONFIG.get_panel_attribute("width"),
+                height=CONFIG.get_panel_attribute("height"),
+                subtitle=f"Coord: {weather['coord']['lon'], weather['coord']['lat']} Country: {weather['sys']['country']}",
             )
-
             ASCII_PANEL = Panel(
                 ASCII_WEATHER,
-                box=box.MINIMAL,
-                padding=(0, 8),
-                width=50,
+                border_style=f"{CONFIG.get_ascii_panel_attribute('border_style')} {CONFIG.city_colour}",
+                box=CONFIG.get_ascii_box_style(),
+                padding=(
+                    CONFIG.get_ascii_panel_attribute("padding_top_right"),
+                    CONFIG.get_ascii_panel_attribute("padding_bottom_left"),
+                ),
+                width=CONFIG.get_ascii_panel_attribute("width"),
+                height=CONFIG.get_ascii_panel_attribute("height"),
             )
 
             CONSOLE.print(ASCII_PANEL)

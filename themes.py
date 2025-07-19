@@ -1,10 +1,72 @@
 from configure import ConfigManager
-from rich import print
+from rich.console import Console
+from rich import print, box
+from rich.panel import Panel
+from rich.columns import Columns
 
-theme = ConfigManager()
 
 def show_all_themes():
-    pass
+    theme = ConfigManager()
+    console = Console()
+    ASCII_WEATHER = r"""
+             ========           
+           ============         
+          ==============        
+          ===============       
+          ===============       
+          ==============        
+           ============+        
+             ========+"""
+
+    content = Columns(
+        [
+            Panel(
+                f"Clear",
+                box=box.MINIMAL,
+            ),
+            Panel(
+                f"Temp: 25 (Feels like: 26) C",
+                box=box.MINIMAL,
+            ),
+            Panel(
+                f"Humidity: 65",
+                box=box.MINIMAL,
+            ),
+            Panel(
+                f"Wind: 3 m/s",
+                box=box.MINIMAL,
+            ),
+        ]
+    )
+
+    PANEL = Panel(
+        content,
+        title=f"[{theme.city_colour}]{DEFAULT_LOCATION.capitalize()}[/{theme.city_colour}]",
+        border_style=f"{theme.get_panel_attribute('border_style')} {theme.city_colour}",
+        box=theme.get_box_style(),
+        padding=(
+            theme.get_panel_attribute("padding_top_right"),
+            theme.get_panel_attribute("padding_bottom_left"),
+        ),
+        width=theme.get_panel_attribute("width"),
+        height=theme.get_panel_attribute("height"),
+        subtitle=f"Coord: {weather['coord']['lon'], weather['coord']['lat']} Country: {weather['sys']['country']}",
+    )
+    ASCII_PANEL = Panel(
+        ASCII_WEATHER,
+        border_style=f"{theme.get_ascii_panel_attribute('border_style')} {theme.city_colour}",
+        box=theme.get_ascii_box_style(),
+        padding=(
+            theme.get_ascii_panel_attribute("padding_top_right"),
+            theme.get_ascii_panel_attribute("padding_bottom_left"),
+        ),
+        width=theme.get_ascii_panel_attribute("width"),
+        height=theme.get_ascii_panel_attribute("height"),
+    )
+
+    console.print(ASCII_PANEL)
+    console.print(PANEL)
+
 
 def show_all_ascii():
     print(

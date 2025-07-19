@@ -1,5 +1,7 @@
 import toml
 import sys
+import os
+import glob
 from pathlib import Path
 
 
@@ -8,6 +10,9 @@ class ConfigManager:
         self.config_dir = Path.cwd() / ".config"
         self.config_file = self.config_dir / "config.toml"
         self._config_data = None
+        self.theme_dir = Path.cwd() / ".config" / "themes"
+        self.theme_file = None
+        self._theme_data = None
 
     @property
     def config(self):
@@ -27,6 +32,40 @@ class ConfigManager:
     @property
     def config_file_location(self):
         return self.config_file
+
+    def get_theme(self):
+        if self._config_data is None:
+            self.config
+        try:
+            defualt_theme = glob.glob(
+                os.path.join(
+                    self.theme_dir,
+                    f"{self._config_data.get("display").get("theme")}.toml",
+                )
+            )
+            self.theme_file = Path(defualt_theme[0])
+            return self.theme_file
+
+        except (FileNotFoundError, AttributeError, KeyError) as e:
+            print(f"Error: Theme file not found or inaccessible: {e}")
+            sys.exit(1)
+            return None
+
+    @property
+    def theme(self):
+        if self._theme_data is None:
+            self._load_theme()
+        return self._theme_data
+
+    def _load_theme(self):
+        self.get_theme()
+        if self.theme_file.exists():
+            with open(self.theme_file, "r") as f:
+                self._theme_data = toml.load(f)
+        else:
+            print(f"Config file not found: {self.theme_file}")
+            self._theme_data = {}
+            sys.exit(1)
 
     @property
     def get_api_key(self):
@@ -58,65 +97,65 @@ class ConfigManager:
     @property
     def city_colour(self):
         try:
-            return self.config.get("display").get("col_city")
+            return self.theme.get("colours").get("col_city")
         except (KeyError, TypeError):
             print(
-                f'No default city colour added in {self.config_file}. Default colour: "light_steel_blue"'
+                f'No default city colour added in {self.theme_file}. Default colour: "light_steel_blue"'
             )
             return "light_steel_blue"
 
     def temp_colour(self, temperature: float):
         try:
             if temperature > 30:
-                return self.config.get("display").get("col_temp").get("high")
+                return self.theme.get("colours").get("col_temp").get("high")
             elif temperature >= 10:
-                return self.config.get("display").get("col_temp").get("mid")
+                return self.theme.get("colours").get("col_temp").get("mid")
             else:
-                return self.config.get("display").get("col_temp").get("low")
+                return self.theme.get("colours").get("col_temp").get("low")
         except (KeyError, TypeError):
-            print(f"No default temp colour added in {self.config_file}.")
+            print(f"No default temp colour added in {self.theme_file}.")
             return "chartreuse3"
 
     def humid_colour(self, humidity: int):
         try:
             if humidity > 65:
-                return self.config.get("display").get("col_humid").get("high")
+                return self.theme.get("colours").get("col_humid").get("high")
             elif humidity >= 55:
-                return self.config.get("display").get("col_humid").get("mid")
+                return self.theme.get("colours").get("col_humid").get("mid")
             else:
-                return self.config.get("display").get("col_humid").get("low")
+                return self.theme.get("colours").get("col_humid").get("low")
         except (KeyError, TypeError):
-            print(f"No default humidity colour added in {self.config_file}.")
+            print(f"No default humidity colour added in {self.theme_file}.")
             return "green_yellow"
 
     def condition_colour(self, condition: str):
         try:
             if condition == "Thunderstorm":
-                return self.config.get("display").get("col_desc").get("Thunderstorm")
+                return self.theme.get("colours").get("col_desc").get("Thunderstorm")
             elif condition == "Drizzle":
-                return self.config.get("display").get("col_desc").get("Drizzle")
+                return self.theme.get("colours").get("col_desc").get("Drizzle")
             elif condition == "Rain":
-                return self.config.get("display").get("col_desc").get("Rain")
+                return self.theme.get("colours").get("col_desc").get("Rain")
             elif condition == "Snow":
-                return self.config.get("display").get("col_desc").get("Snow")
+                return self.theme.get("colours").get("col_desc").get("Snow")
             elif condition == "Atmosphere":
-                return self.config.get("display").get("col_desc").get("Atmosphere")
+                return self.theme.get("colours").get("col_desc").get("Atmosphere")
             elif condition == "Clear":
-                return self.config.get("display").get("col_desc").get("Clear")
+                return self.theme.get("colours").get("col_desc").get("Clear")
             elif condition == "Clouds":
-                return self.config.get("display").get("col_desc").get("Clouds")
+                return self.theme.get("colours").get("col_desc").get("Clouds")
         except (KeyError, TypeError):
             print(
-                f'No default condition colour ("col_desc") added in {self.config_file}.'
+                f'No default condition colour ("col_desc") added in {self.theme_file}.'
             )
             return "dark_orange"
 
     @property
     def wind_colour(self):
         try:
-            return self.config.get("display").get("col_wind")
+            return self.theme.get("colours").get("col_wind")
         except (KeyError, TypeError):
-            print(f"No default wind colour added in {self.config_file}.")
+            print(f"No default wind colour added in {self.theme_file}.")
             return "sky_blue1"
 
     def ascii_art(self, condition: str, icon: str):
@@ -258,3 +297,29 @@ class ConfigManager:
          ..................-      
          ...................      
            ................"""
+
+    def get_panel_attribute(self, key):
+        return self.theme.get("panel", {}).get(key)
+
+    def get_box_style(self):
+        try:
+            from rich import box
+            box_style = self.theme.get("panel", {}).get("box").upper()
+            box_object = getattr(box, box_style)
+            return box_object
+        except AttributeError as e:
+            print(f"Error getting box attribute value from config. [{self.get_theme()}]")
+            sys.exit(1)
+
+    def get_ascii_panel_attribute(self,key):
+        return self.theme.get("ascii_panel", {}).get(key)
+
+    def get_ascii_box_style(self):
+        try:
+            from rich import box
+            box_style = self.theme.get("ascii_panel", {}).get("box").upper()
+            box_object = getattr(box, box_style)
+            return box_object
+        except AttributeError as e:
+            print(f"Error getting box attribute value from {self.theme_file}.")
+            sys.exit(1)
