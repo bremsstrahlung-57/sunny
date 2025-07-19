@@ -6,14 +6,10 @@ __pycache__/
 # Virtual environment
 .venv/
 sunny.egg-info/
+dist/
 
 # User-specific config
 config.toml
-config.json
 
 # Temporary or test files
 dump.txt
-
-# OS-generated files
-.DS_Store
-Thumbs.db

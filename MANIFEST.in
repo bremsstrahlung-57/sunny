@@ -1,0 +1,4 @@
+include sunny/.config/themes/*.toml
+include sunny/.config/*.toml
+include README.md
+include LICENSE
