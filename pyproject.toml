@@ -28,3 +28,6 @@ Homepage = "https://github.com/bremsstrahlung-57/sunny"
 
 [project.scripts]
 sunny = "sunny.__main__:main"
+
+[tool.setuptools.package-data]
+sunny = [".config/*.toml", ".config/themes/*.toml"]

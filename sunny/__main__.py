@@ -1,6 +1,7 @@
 from sunny.utility import Weather
 from sunny.configure import ConfigManager
 from sunny.themes import show_all_ascii, show_all_themes
+from sunny.config_maker import add_config
 
 import sys
 import argparse
@@ -42,8 +43,12 @@ def main():
         action="store_true",
     )
     parser.add_argument("--themes", help="Shows all theme`", action="store_true")
+    parser.add_argument("--init", help="Initialise config files", action="store_true")
 
     args = parser.parse_args()
+
+    if args.init:
+        add_config()
 
     if args.showall:
         show_all_ascii()
