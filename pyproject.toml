@@ -1,12 +1,10 @@
-# pyproject.toml
-
 [build-system]
 requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "sunny"
-version = "1.0.0"
+version = "1.0.2"
 description = "A minimal CLI tool to see weather on your terminal"
 readme = "README.md"
 authors = [{ name = "Sagar Sharma", email = "sagar292905@gmail.com" }]

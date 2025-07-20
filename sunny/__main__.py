@@ -85,6 +85,8 @@ def main():
             f"[{color}]{CONFIG.ascii_art(cond, ascii["weather"][0]["icon"])}[/{color}]"
         )
         print(ascii_art)
+        if(args.city and not (args.temp or args.humidity or args.description)):
+            sys.exit(0)
 
     if args.themes:
         print()

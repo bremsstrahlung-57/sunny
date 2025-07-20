@@ -2,16 +2,25 @@ import toml
 import sys
 import os
 from pathlib import Path
+from importlib.resources import files
 
 
 class ConfigManager:
     def __init__(self) -> None:
-        self.config_dir = Path.cwd() / "sunny" /".config"
+        self.config_dir = files("sunny").joinpath(".config")
+        self.theme_dir = self.config_dir.joinpath("themes")
         self.config_file = self.config_dir / "config.toml"
-        self._config_data = None
-        self.theme_dir = Path.cwd() / "sunny" / ".config" / "themes"
         self.theme_file = None
+        self._config_data = None
         self._theme_data = None
+        self.user_config_dir = Path.home() / ".config" / "sunny"
+        self.user_theme_dir = self.user_config_dir / "themes"
+
+        if (self.user_config_dir / "config.toml").exists():
+            self.config_file = self.user_config_dir / "config.toml"
+        else:
+            self.config_file = self.config_dir / "config.toml"
+
 
     def _load_config(self) -> dict:
         """Load configuration data from file."""
@@ -19,7 +28,7 @@ class ConfigManager:
             print(f"Config file not found: {self.config_file}")
             sys.exit(1)
         
-        with open(self.config_file, "r") as f:
+        with self.config_file.open("r", encoding="utf-8") as f:
             self._config_data = toml.load(f)
         return self._config_data
 
@@ -45,13 +54,13 @@ class ConfigManager:
                 display_config = {}
             
             theme_name = display_config.get("theme", "sunny_dynamic")
-            theme_path = os.path.join(self.theme_dir, f"{theme_name}.toml")
+            theme_path = self.user_theme_dir.joinpath(f"{theme_name}.toml")
             
             if os.path.exists(theme_path):
                 self.theme_file = Path(theme_path)
                 return self.theme_file
             
-            fallback_path = os.path.join(self.theme_dir, "sunny_dynamic.toml")
+            fallback_path = self.theme_dir.joinpath("sunny_dynamic.toml")
             if os.path.exists(fallback_path):
                 if theme_name != "sunny_dynamic":
                     print(f"Warning: Theme '{theme_name}' not found, falling back to sunny_dynamic")
@@ -71,7 +80,7 @@ class ConfigManager:
             print(f"Theme file not found: {theme_file}")
             sys.exit(1)
             
-        with open(theme_file, "r") as f:
+        with theme_file.open("r", encoding="utf-8") as f:
             self._theme_data = toml.load(f)
         return self._theme_data
 

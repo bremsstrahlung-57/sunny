@@ -5,19 +5,20 @@ from rich import print, box
 from rich.panel import Panel
 from rich.console import Console
 from rich.columns import Columns
+from importlib.resources import files
 
 
 def show_all_themes():
     """Shows a preview of all themes"""
     console = Console()
-    themes_dir = Path.cwd() / "sunny" / ".config" / "themes"
-    theme_files = [f for f in os.listdir(themes_dir) if f.endswith(".toml")]
+    themes_dir = files("sunny").joinpath(".config", "themes")
+    theme_files = [f for f in themes_dir.iterdir() if f.name.endswith(".toml")]
 
     for theme_file in theme_files:
-        theme_path = os.path.join(themes_dir, theme_file)
-        with open(theme_path, "r") as f:
+        theme_path = themes_dir.joinpath(theme_file.name)
+        with theme_path.open("r", encoding="utf-8") as f:
             theme = toml.load(f)
-        theme_name = theme_file.split(".")[0].capitalize()
+        theme_name = theme_file.name.split(".")[0].capitalize()
         panel_config = theme.get("panel", {})
         border_style = panel_config.get("border_style", "bold")
         box_attr = getattr(box, panel_config.get("box", "ROUNDED"))

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="sunny",
-    version="1.0.0",
+    version="1.0.2",
     description="A minimal CLI tool to see weather on your terminal",
     author="Sagar Sharma",
     author_email="sagar292905@gmail.com",
