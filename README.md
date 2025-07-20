@@ -4,14 +4,30 @@
 
 ## Installation
 
-### Release 1.0.2 (Recommended)
+### Release 1.0.3 (Recommended)
 
+1. Install `sunny-1.0.3-py3-none-any.whl`
+2. Run this 
 ```bash
-curl -L -O https://github.com/bremsstrahlung-57/sunny/releases/download/v1.0.2/sunny-1.0.2-py3-none-any.whl
-python3 -m pip install sunny-1.0.2-py3-none-any.whl
+pip install sunny-1.0.3-py3-none-any.whl
+```
+If on Linux
+```bash
+pipx install sunny-1.0.3-py3-none-any.whl
+```
+3. You can delete `sunny-1.0.3-py3-none-any.whl` (optional)
+```bash
+rm sunny-1.0.3-py3-none-any.whl
+```
+4. You are ready
+```bash
+sunny
+sunny --init
+sunny -h
+sunny -v
 ```
 
-#### For actual way how this will work and customizing the themes
+#### For dev or customizing the themes
 ```bash
 git clone https://github.com/bremsstrahlung-57/sunny.git
 cd sunny
