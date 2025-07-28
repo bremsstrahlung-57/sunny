@@ -1,4 +1,2 @@
 include README.md
 include LICENSE
-recursive-include sunny/.config *.toml
-recursive-include sunny/.config/themes *.toml

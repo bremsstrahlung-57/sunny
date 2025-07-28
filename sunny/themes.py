@@ -1,17 +1,17 @@
-import os
 import toml
-from pathlib import Path
 from rich import print, box
 from rich.panel import Panel
 from rich.console import Console
 from rich.columns import Columns
-from importlib.resources import files
+from pathlib import Path
+from platformdirs import user_config_dir
 
 
 def show_all_themes():
     """Shows a preview of all themes"""
     console = Console()
-    themes_dir = files("sunny").joinpath(".config", "themes")
+    APP_NAME = "sunny"
+    themes_dir = Path(user_config_dir(APP_NAME)) / "themes"
     theme_files = [f for f in themes_dir.iterdir() if f.name.endswith(".toml")]
 
     for theme_file in theme_files:
