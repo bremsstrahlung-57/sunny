@@ -25,7 +25,7 @@ class ConfigManager:
 
 # Get your free API key from https://openweathermap.org/api
 [api]
-key = "cec522aaf50e3b7cc4f876e55990f571"
+key = "YOUR-OPEN-WEATHER-API-KEY"
 
 # Set your default city
 [defaults]
@@ -233,10 +233,6 @@ Clouds = "purple3"
     def _load_config(self) -> dict:
         """Load configuration data from file."""
         if not self.CONFIG_FILE.exists():
-            # print(
-            #     f"[red]Config file not found:[/red] {self.CONFIG_FILE}"
-            # )
-            # sys.exit(1)
             self.setup_config()
 
         with self.CONFIG_FILE.open("r", encoding="utf-8") as f:
