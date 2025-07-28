@@ -33,11 +33,11 @@ rm sunny-1.2.5-py3-none-any.whl
 #### Using pipx (Linux/macOS)
 1. Install the `.whl` file from `Releases`. Latest version is `1.2.5``
 
-2. 
+2. Install it using `pipx`
 ```bash
 pipx install sunny-1.2.5-py3-none-any.whl
 ```
-3. Optional
+3. You can delete the package (Optional)
 ```bash
 rm sunny-1.2.5-py3-none-any.whl
 ```
@@ -67,3 +67,13 @@ git clone https://github.com/bremsstrahlung-57/sunny.git
 cd sunny
 python3 -m pip install -e .
 ```
+
+## Future targets
+- Add forecast support
+- More data (pressure, AQI etc.)
+- Toggle between current, hourly, and 7-day forecast.
+- More languages support
+- Location auto-detect via IP if no city is provided
+- Warnings:  Warn user if storm, high UV, or rain expected today
+- Adding More Themes
+- Support multiple weather APIs
