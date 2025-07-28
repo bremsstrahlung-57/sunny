@@ -1,4 +1,4 @@
-# Sunny 🌞 [![version](https://img.shields.io/badge/version-1.2.5-blue)](https://github.com/bremsstrahlung-57/sunny/releases/tag/v1.2.5)
+# Sunny 🌞 [![version](https://img.shields.io/badge/version-1.2.6-blue)](https://github.com/bremsstrahlung-57/sunny/releases/tag/v1.2.6)
 
 A minimal, themeable CLI weather tool for your terminal - beautifully display weather information right where you need it.
 
@@ -16,30 +16,30 @@ A minimal, themeable CLI weather tool for your terminal - beautifully display we
 
 ## Installation 📦
 
-### Latest Release (v1.2.5)
+### Latest Release (v1.2.6)
 
 #### Using pip (Recommended)
-1. Install the `.whl` file from `Releases`. Latest version is `1.2.5`
+1. Install the `.whl` file from `Releases`. Latest version is `1.2.6`
 
 2. Install it using `pip`
 ```bash
-pip install sunny-1.2.5-py3-none-any.whl
+pip install sunny-1.2.6-py3-none-any.whl
 ```
 3. You can delete the package (Optional)
 ```bash
-rm sunny-1.2.5-py3-none-any.whl
+rm sunny-1.2.6-py3-none-any.whl
 ```
 
 #### Using pipx (Linux/macOS)
-1. Install the `.whl` file from `Releases`. Latest version is `1.2.5``
+1. Install the `.whl` file from `Releases`. Latest version is `1.2.6`
 
 2. Install it using `pipx`
 ```bash
-pipx install sunny-1.2.5-py3-none-any.whl
+pipx install sunny-1.2.6-py3-none-any.whl
 ```
 3. You can delete the package (Optional)
 ```bash
-rm sunny-1.2.5-py3-none-any.whl
+rm sunny-1.2.6-py3-none-any.whl
 ```
 
 ## Quick Start 🚀
