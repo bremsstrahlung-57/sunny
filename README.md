@@ -1,4 +1,4 @@
-# Sunny 🌞
+# Sunny 🌞 [![version](https://img.shields.io/badge/version-1.2.5-blue)](https://github.com/bremsstrahlung-57/sunny/releases/tag/v1.2.5)
 
 A minimal, themeable CLI weather tool for your terminal - beautifully display weather information right where you need it.
 
