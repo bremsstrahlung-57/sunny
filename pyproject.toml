@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sunny"
-version = "1.2.5"
+version = "1.2.6"
 description = "A minimal CLI tool to see weather on your terminal"
 readme = "README.md"
 authors = [{ name = "Sagar Sharma", email = "sagar292905@gmail.com" }]

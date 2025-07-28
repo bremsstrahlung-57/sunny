@@ -52,8 +52,8 @@ padding_top = 1
 padding_right = 1
 padding_bottom = 1
 padding_left = 1
-width = 55
-height = 10
+width = 60
+height = 12
 
 [ascii_panel]
 border_style = "bold"
@@ -65,7 +65,7 @@ padding_top = 0
 padding_right = 0
 padding_bottom = 8
 padding_left = 8
-width = 50
+width = 60
 height = 12
 
 [colours]
@@ -104,8 +104,8 @@ padding_top = 0
 padding_right = 0                
 padding_bottom = 0               
 padding_left = 0                 
-width = 55                       
-height = 10                      
+width = 60                 
+height = 12                     
 
 [ascii_panel]
 border_style = "dim"             
@@ -117,7 +117,7 @@ padding_top = 0
 padding_right = 0                
 padding_bottom = 4               
 padding_left = 4                 
-width = 50                       
+width = 60                     
 height = 12                      
         
 [colours]
@@ -156,8 +156,8 @@ padding_top = 1
 padding_right = 1
 padding_bottom = 1
 padding_left = 1
-width = 55
-height = 10
+width = 60
+height = 12
 
 [ascii_panel]
 border_style = "bold"
@@ -169,7 +169,7 @@ padding_top = 0
 padding_right = 0
 padding_bottom = 4
 padding_left = 4
-width = 50
+width = 60
 height = 12
 
 [colours]
