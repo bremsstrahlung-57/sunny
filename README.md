@@ -1,79 +1,93 @@
-# Sunny 🌞 [![version](https://img.shields.io/badge/version-1.2.6-blue)](https://github.com/bremsstrahlung-57/sunny/releases/tag/v1.2.6)
+# Sunny 🌞 [![version](https://img.shields.io/badge/version-1.2.6-blue)](https://github.com/bremsstrahlung-57/sunny/releases/tag/v1.2.6) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A minimal, themeable CLI weather tool for your terminal - beautifully display weather information right where you need it.
+A minimal, themeable CLI weather tool for your terminal. Get beautifully displayed weather information right where you need it.
 
 ## Features ✨
 
-- Minimal and clean interface
-- Customizable Themes and Color Schemes
-- Create and Share Custom Themes
-- ASCII Art of Weather Condition
-- Multiple Temperature Units (°C/°F)
-- Wind Speed
-- Humidity
-- Terminal-friendly Output
-- Minimal Resource Usage
+- **Minimal & Clean:** A clean interface that shows you just what you need.
+- **Customizable:** Personalize your weather display with themes and color schemes.
+- **ASCII Art:** Fun and informative ASCII art representing current weather conditions.
+- **Essential Info:** Get temperature (°C/°F), wind speed, and humidity.
+- **Terminal-Friendly:** Designed for a great experience in any terminal.
 
 ## Installation 📦
 
-### Latest Release (v1.2.6)
+The only way to install `sunny` for now is from the `.whl` file from the latest release.
 
-#### Using pip (Recommended)
-1. Install the `.whl` file from `Releases`. Latest version is `1.2.6`
+1.  **Download the `.whl` file** from the [latest release](https://github.com/bremsstrahlung-57/sunny/releases/latest).
 
-2. Install it using `pip`
-```bash
-pip install sunny-1.2.6-py3-none-any.whl
-```
-3. You can delete the package (Optional)
-```bash
-rm sunny-1.2.6-py3-none-any.whl
-```
+2.  **Install the package**. You have two options:
 
-#### Using pipx (Linux/macOS)
-1. Install the `.whl` file from `Releases`. Latest version is `1.2.6`
+    -   **Using `pipx` (Recommended for CLI tools)**: This installs `sunny` globally in an isolated environment, so it won't conflict with other packages.
 
-2. Install it using `pipx`
-```bash
-pipx install sunny-1.2.6-py3-none-any.whl
-```
-3. You can delete the package (Optional)
-```bash
-rm sunny-1.2.6-py3-none-any.whl
-```
+        ```bash
+        pipx install sunny-1.2.6-py3-none-any.whl
+        ```
+
+    -   **Using `pip`**: This installs `sunny` in your current Python environment.
+
+        ```bash
+        pip install sunny-1.2.6-py3-none-any.whl
+        ```
+
+3.  **Clean up (Optional)**. You can now delete the downloaded file.
+    -   On **Linux/macOS**:
+        ```bash
+        rm sunny-1.2.6-py3-none-any.whl
+        ```
+    -   On **Windows**:
+        ```powershell
+        del sunny-1.2.6-py3-none-any.whl
+        ```
+
+## Configuration ⚙️
+
+Before you can fetch weather data, you need to configure `sunny` with your OpenWeatherMap API key.
+
+1.  **Get an API Key:**
+    Sign up for a free account on [OpenWeatherMap](https://openweathermap.org/appid) to get your API key.
+
+2.  **Initialize Sunny:**
+    Run the following command to initialize `sunny`. It will prompt you to enter your API key and set a default location.
+
+    ```bash
+    sunny --init
+    ```
 
 ## Quick Start 🚀
 
-```bash
-# Initialize sunny with your preferences
-sunny --init
+Once configured, you can get the weather instantly.
 
-# Get current weather
+```bash
+# Get the weather for your default location
 sunny
 
-# Display help
+# Get weather for a specific city
+# (use underscores for cities with spaces)
+sunny -c New_York
+
+# Display help for all commands
 sunny -h
 
-# Check version
+# Check the installed version
 sunny -v
 ```
 
 ## Development Setup 🛠️
 
-To contribute or customize themes:
+If you want to contribute or customize themes:
 
 ```bash
 git clone https://github.com/bremsstrahlung-57/sunny.git
 cd sunny
-python3 -m pip install -e .
+pip install -e .
 ```
 
-## Future targets
-- Add forecast support
-- More data (pressure, AQI etc.)
-- Toggle between current, hourly, and 7-day forecast.
-- More languages support
-- Location auto-detect via IP if no city is provided
-- Warnings:  Warn user if storm, high UV, or rain expected today
-- Adding More Themes
-- Support multiple weather APIs
+## Future Targets 🎯
+
+- **Forecast Support:** Add daily and hourly forecasts.
+- **More Data:** Include pressure, AQI, and other useful metrics.
+- **Location Auto-Detect:** Automatically find the user's location via IP address.
+- **Weather Alerts:** Warn users about storms, high UV, or rain.
+- **More Themes & Languages:** Expand customization and accessibility.
+- **Support for More Weather APIs:** Add more data sources.
