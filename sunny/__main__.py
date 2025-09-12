@@ -10,12 +10,12 @@ def main():
 
     except KeyboardInterrupt:
 
-        print("\n[yellow]Operation cancelled by user[/yellow]")
+        print("\nOperation cancelled by user")
         sys.exit(0)
 
     except Exception as e:
 
-        print(f"[bold red]Unexpected error[/bold red]: {str(e)}")
+        print(f"Unexpected error: {str(e)}")
         sys.exit(1)
 
 

@@ -53,7 +53,7 @@ padding_right = 1
 padding_bottom = 1
 padding_left = 1
 width = 60
-height = 12
+height = 10
 
 [ascii_panel]
 border_style = "bold"
@@ -66,7 +66,7 @@ padding_right = 0
 padding_bottom = 8
 padding_left = 8
 width = 60
-height = 12
+height = 10
 
 [colours]
 col_city = "light_steel_blue"
@@ -105,7 +105,7 @@ padding_right = 0
 padding_bottom = 0               
 padding_left = 0                 
 width = 60                 
-height = 12                     
+height = 10                     
 
 [ascii_panel]
 border_style = "dim"             
@@ -118,7 +118,7 @@ padding_right = 0
 padding_bottom = 4               
 padding_left = 4                 
 width = 60                     
-height = 12                      
+height = 10                      
         
 [colours]
 col_city = "grey70"              
@@ -157,7 +157,7 @@ padding_right = 1
 padding_bottom = 1
 padding_left = 1
 width = 60
-height = 12
+height = 10
 
 [ascii_panel]
 border_style = "bold"
@@ -170,7 +170,7 @@ padding_right = 0
 padding_bottom = 4
 padding_left = 4
 width = 60
-height = 12
+height = 10
 
 [colours]
 col_city = "cyan3"
@@ -280,6 +280,7 @@ Clouds = "purple3"
     def get_api_key(self) -> str:
         """Get API key from config."""
         key_data = self.config
+
         try:
             return key_data.get("api").get("key")
         except Exception as e:
@@ -372,6 +373,8 @@ Clouds = "purple3"
                 return self.theme.get("colours").get("col_desc").get("Clear")
             elif condition == "Clouds":
                 return self.theme.get("colours").get("col_desc").get("Clouds")
+            else:
+                return "dark_orange"
         except Exception as e:
             print(
                 f"Warning: No default condition color found in {self.get_theme_file()}. Using fallback value 'dark_orange'. Exception: {e}"

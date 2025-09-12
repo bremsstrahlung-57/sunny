@@ -1,11 +1,10 @@
 import requests
+import sys
 from sunny.configure import ConfigManager
 
 API_CONFIG = ConfigManager()
 
 api_key = API_CONFIG.get_api_key
-
-
 class Weather:
     def __init__(self) -> None:
         pass
@@ -19,18 +18,19 @@ class Weather:
             response.raise_for_status()
             data = response.json()
             return data
-
-        except requests.exceptions.HTTPError as err:
-            if err.response.status_code == 404:
-                return f"404 Error: Place Not Found"
+        except requests.exceptions.HTTPError as http_err:
+            if http_err.response.status_code == 401:
+                sys.exit(
+                    "Error: Unauthorized. Check your API key."
+                )
+            elif http_err.response.status_code == 404:
+                sys.exit(
+                    f"Error: Location '{location}' not found."
+                )
             else:
-                return f"HTTP Error"
-        except requests.exceptions.ConnectionError as errc:
-            return f"Connection Error"
-        except requests.exceptions.Timeout as errt:
-            return f"Timeout Error"
-        except requests.exceptions.RequestException as e:
-            return f"An unexpected error occurred"
+                sys.exit(f"Error: HTTP error {http_err.response.status_code}")
+        except requests.exceptions.RequestException as req_err:
+            sys.exit(f"Error: An error occurred with the request: {req_err}")
 
     def fetch_temp(self, location: str, units: str = "metric") -> float:
         data = self.get_weather_city_json(location, units)

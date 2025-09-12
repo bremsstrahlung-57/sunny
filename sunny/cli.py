@@ -140,11 +140,9 @@ class WeatherCLI:
             condition = weather_info["main"]
             wind_speed = wind_data["speed"]
 
-            # Create ASCII weather panel
             ascii_color = self.config.condition_colour(condition)
             ascii_art = f"[{ascii_color}]{self.config.ascii_art(condition, weather_info['icon'])}[/{ascii_color}]"
 
-            # Create content panels
             content_panels = [
                 Panel(
                     f"[{self.config.condition_colour(condition)}]{description.capitalize()}[/{self.config.condition_colour(condition)}]",
@@ -194,12 +192,11 @@ class WeatherCLI:
                 height=self.config.get_ascii_panel_attribute("height"),
             )
 
-            # Display panels
             self.console.print(ascii_panel)
             self.console.print(weather_panel)
 
         except (KeyError, TypeError) as e:
-            print(f"[bold red]Error[/bold red]: Invalid weather data format - {str(e)}")
+            print(f"[bold red]Error[/bold red]: Invalid weather data format - {e}")
             sys.exit(1)
 
     def display_temperature_only(
