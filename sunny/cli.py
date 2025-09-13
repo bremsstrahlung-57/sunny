@@ -5,6 +5,7 @@ from sunny.themes import show_all_ascii, show_all_themes
 import os
 import sys
 import argparse
+from datetime import datetime
 from typing import Dict, Any, Optional
 from rich.console import Console
 from rich import print, box
@@ -52,6 +53,9 @@ class WeatherCLI:
         )
         parser.add_argument(
             "--ascii", help="Show ascii art of weather condition`", action="store_true"
+        )
+        parser.add_argument(
+            "--forecast", help="Show weather forecast of 5 days`", action="store_true"
         )
         parser.add_argument(
             "--showall",
@@ -125,7 +129,7 @@ class WeatherCLI:
         deg_symbol: str,
         wind_unit: str,
     ) -> None:
-        """Display complete weather information in panels."""
+        """Display complete weather information."""
         try:
             main_data = weather_data["main"]
             weather_info = weather_data["weather"][0]
@@ -164,7 +168,6 @@ class WeatherCLI:
 
             content = Columns(content_panels)
 
-            # Main weather panel
             weather_panel = Panel(
                 content,
                 title=f"[{self.config.city_colour}]{location.replace('%20', ' ').title()}[/{self.config.city_colour}]",
@@ -176,10 +179,9 @@ class WeatherCLI:
                 ),
                 width=self.config.get_panel_attribute("width"),
                 height=self.config.get_panel_attribute("height"),
-                subtitle=f"Coord: ({coord_data['lon']:.2f}, {coord_data['lat']:.2f}) | Country: {sys_data['country']}",
+                subtitle=f"[dim]Coord: ({coord_data['lon']:.2f}, {coord_data['lat']:.2f}) | Country: {sys_data['country']}[/dim]",
             )
 
-            # ASCII panel
             ascii_panel = Panel(
                 ascii_art,
                 border_style=f"{self.config.get_ascii_panel_attribute('border_style')} {self.config.city_colour}",
@@ -194,6 +196,63 @@ class WeatherCLI:
 
             self.console.print(ascii_panel)
             self.console.print(weather_panel)
+
+        except (KeyError, TypeError) as e:
+            print(f"[bold red]Error[/bold red]: Invalid weather data format - {e}")
+            sys.exit(1)
+
+    def display_forecast(
+        self,
+        location: str,
+        weather_data: list,
+        deg_symbol: str,
+        wind_unit: str,
+    ):
+        """Display 5-days forecast."""
+
+        try:
+            day_cards = []
+            for i in range(5):
+
+                dt_text = weather_data[i].get("dt_txt")
+                dt = datetime.strptime(dt_text, "%Y-%m-%d %H:%M:%S")
+                day_str = dt.strftime("%a %d %b")
+                time_str = dt.strftime("%I:%M %p")
+
+                temperature = weather_data[i].get("temp")
+                feels_like_temp = weather_data[i].get("feels_like_temp")
+                humidity = weather_data[i].get("humidity")
+                description = weather_data[i].get("description")
+                condition = weather_data[i].get("main")
+                wind_speed = weather_data[i].get("wind_speed")
+                icon = weather_data[i].get("icon")
+
+                ascii_color = self.config.condition_colour(condition)
+                ascii_art = f"[{ascii_color}]{self.config.ascii_art(condition,icon )}[/{ascii_color}]"
+
+                details = "\n".join(
+                    [
+                        f"[{self.config.condition_colour(condition)}]{description.capitalize()}[/{self.config.condition_colour(condition)}]",
+                        f"[{self.config.temp_colour(temperature)}]Temp: {temperature:.1f}° (feels {feels_like_temp:.1f}°) {deg_symbol}[/{self.config.temp_colour(temperature)}]",
+                        f"[{self.config.humid_colour(humidity)}]Humidity: {humidity}%[/{self.config.humid_colour(humidity)}]",
+                        f"[{self.config.wind_colour}]Wind: {wind_speed} {wind_unit}[/{self.config.wind_colour}]",
+                    ]
+                )
+
+                card = Panel(
+                    f"{ascii_art}\n\n{details}",
+                    title=f"[{self.config.city_colour}]{day_str}[/{self.config.city_colour}]",
+                    subtitle=f"[dim]{time_str}[/dim]",
+                    border_style=f"{self.config.get_panel_attribute('border_style')} {self.config.get_panel_attribute('border_colour')}",
+                    box=self.config.get_box_style(),
+                    padding=(1,4),
+                    width=30,
+                    height=20,
+                )
+
+                day_cards.append(card)
+
+            self.console.print(Columns(day_cards, expand=True))
 
         except (KeyError, TypeError) as e:
             print(f"[bold red]Error[/bold red]: Invalid weather data format - {e}")
@@ -287,6 +346,12 @@ class WeatherCLI:
             if args.city and not (args.temp or args.humidity or args.description):
                 return
 
-        if not any([args.temp, args.humidity, args.description]) or len(sys.argv) == 1:
+        if (
+            not any([args.temp, args.humidity, args.description, args.forecast])
+            or len(sys.argv) == 1
+        ):
             weather_data = self.get_weather_data(location, unit)
             self.display_full_weather(weather_data, location, deg_symbol, wind_unit)
+        else:
+            data = self.weather.fetch_forecast(location, unit)
+            self.display_forecast(location, data, deg_symbol, wind_unit)
