@@ -1,95 +1,81 @@
-# Sunny 🌞 [![version](https://img.shields.io/badge/version-1.2.6-blue)](https://github.com/bremsstrahlung-57/sunny/releases/tag/v1.2.6) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<div align="center">
+
+# Sunny 🌞
+
+[![version](https://img.shields.io/badge/version-1.4.0-blue)](https://github.com/bremsstrahlung-57/sunny/releases/tag/v1.4.0)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.7+-blue.svg)](https://python.org)
+
+</div>
 
 A minimal, themeable CLI weather tool for your terminal. Get beautifully displayed weather information right where you need it.
 
-## Features ✨
+## Features
 
-- **Minimal & Clean:** A clean interface that shows you just what you need.
-- **Customizable:** Personalize your weather display with themes and color schemes.
-- **ASCII Art:** Fun and informative ASCII art representing current weather conditions.
-- **Essential Info:** Get temperature (°C/°F), wind speed, and humidity.
-- **Terminal-Friendly:** Designed for a great experience in any terminal.
-- **5-Day Weather Forecast**: You can get a 5-day weather forecast.
+- **Minimal & Clean** - Clean interface that shows you just what you need
+- **Customizable** - Personalize your weather display with themes and color schemes
+- **ASCII Art** - Fun and informative ASCII art representing current weather conditions
+- **Essential Info** - Temperature (°C/°F), wind speed, and humidity
+- **Terminal-Friendly** - Designed for a great experience in any terminal
+- **5-Day Forecast** - Extended weather forecast support
 
-## Installation 📦
+## Installation
 
-### One-Line Install (Recommended)
+### Quick Install (Recommended)
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/bremsstrahlung-57/sunny/master/install.sh | bash
 ```
-This script will:
-- Download the latest release automatically
-- Install using pipx (if available) for a clean, isolated installation
-- Fall back to pip if pipx is not available
-- Clean up downloaded files automatically
 
-## Manual Installation
+This script will automatically:
+- Download the latest release
+- Install using pipx (if available) for isolated installation
+- Fall back to pip if pipx is unavailable
+- Clean up downloaded files
 
-The other way to install `sunny` for now is from the `.whl` file from the latest release.
+### Manual Installation
 
-1.  **Download the `.whl` file** from the [latest release](https://github.com/bremsstrahlung-57/sunny/releases/latest).
+1. Download the `.whl` file from the [latest release](https://github.com/bremsstrahlung-57/sunny/releases/latest)
 
-2.  **Install the package**. You have two options:
+2. Install using your preferred method:
 
-    -   **Using `pipx` (Recommended for CLI tools)**: This installs `sunny` globally in an isolated environment, so it won't conflict with other packages.
+    **Using pipx (Recommended)**
+    ```bash
+    pipx install sunny-1.4.0-py3-none-any.whl
+    ```
 
-        ```bash
-        pipx install sunny-1.4.0-py3-none-any.whl
-        ```
+    **Using pip**
+    ```bash
+    pip install sunny-1.4.0-py3-none-any.whl
+    ```
 
-    -   **Using `pip`**: This installs `sunny` in your current Python environment.
+## Configuration
 
-        ```bash
-        pip install sunny-1.4.0-py3-none-any.whl
-        ```
+1. **Get an API Key** from [OpenWeatherMap](https://openweathermap.org/appid) (free account required)
 
-3.  **Clean up (Optional)**. You can now delete the downloaded file.
-    -   On **Linux/macOS**:
-        ```bash
-        rm sunny-1.4.0-py3-none-any.whl
-        ```
-    -   On **Windows**:
-        ```powershell
-        del sunny-1.4.0-py3-none-any.whl
-        ```
-
-## Configuration ⚙️
-
-Before you can fetch weather data, you need to configure `sunny` with your OpenWeatherMap API key.
-
-1.  **Get an API Key:**
-    Sign up for a free account on [OpenWeatherMap](https://openweathermap.org/appid) to get your API key.
-
-2.  **Initialize Sunny:**
-    Run the following command to initialize `sunny`. It will prompt you to enter your API key and set a default location.
-
+2. **Initialize Sunny**
     ```bash
     sunny --init
     ```
+    Follow the prompts to enter your API key and set a default location.
 
-## Quick Start 🚀
-
-Once configured, you can get the weather instantly.
+## Usage
 
 ```bash
-# Get the weather for your default location
+# Get weather for your default location
 sunny
 
-# Get weather for a specific city
-# (use underscores for cities with spaces)
+# Get weather for a specific city (use underscores for spaces)
 sunny -c New_York
 
-# Display help for all commands
+# Display help
 sunny -h
 
-# Check the installed version
+# Check version
 sunny -v
 ```
 
-## Development Setup 🛠️
-
-If you want to contribute or customize themes:
+## Development
 
 ```bash
 git clone https://github.com/bremsstrahlung-57/sunny.git
@@ -97,10 +83,18 @@ cd sunny
 pip install -e .
 ```
 
-## Future Targets 🎯
+## Roadmap
 
-- **More Data:** Include pressure, AQI, and other useful metrics.
-- **Location Auto-Detect:** Automatically find the user's location via IP address.
-- **Weather Alerts:** Warn users about storms, high UV, or rain.
-- **More Themes & Languages:** Expand customization and accessibility.
-- **Support for More Weather APIs:** Add more data sources.
+- [ ] More weather metrics (pressure, AQI)
+- [ ] Location auto-detection via IP
+- [ ] Weather alerts and warnings
+- [ ] Additional themes and languages
+- [ ] Multiple weather API support
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
