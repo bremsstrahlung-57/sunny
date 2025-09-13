@@ -9,6 +9,7 @@ A minimal, themeable CLI weather tool for your terminal. Get beautifully display
 - **ASCII Art:** Fun and informative ASCII art representing current weather conditions.
 - **Essential Info:** Get temperature (°C/°F), wind speed, and humidity.
 - **Terminal-Friendly:** Designed for a great experience in any terminal.
+- **5-Day Weather Forecast**: You can get a 5-day weather forecast.
 
 ## Installation 📦
 
@@ -21,23 +22,23 @@ The only way to install `sunny` for now is from the `.whl` file from the latest 
     -   **Using `pipx` (Recommended for CLI tools)**: This installs `sunny` globally in an isolated environment, so it won't conflict with other packages.
 
         ```bash
-        pipx install sunny-1.2.6-py3-none-any.whl
+        pipx install sunny-1.4.0-py3-none-any.whl
         ```
 
     -   **Using `pip`**: This installs `sunny` in your current Python environment.
 
         ```bash
-        pip install sunny-1.2.6-py3-none-any.whl
+        pip install sunny-1.4.0-py3-none-any.whl
         ```
 
 3.  **Clean up (Optional)**. You can now delete the downloaded file.
     -   On **Linux/macOS**:
         ```bash
-        rm sunny-1.2.6-py3-none-any.whl
+        rm sunny-1.4.0-py3-none-any.whl
         ```
     -   On **Windows**:
         ```powershell
-        del sunny-1.2.6-py3-none-any.whl
+        del sunny-1.4.0-py3-none-any.whl
         ```
 
 ## Configuration ⚙️
@@ -85,7 +86,6 @@ pip install -e .
 
 ## Future Targets 🎯
 
-- **Forecast Support:** Add daily and hourly forecasts.
 - **More Data:** Include pressure, AQI, and other useful metrics.
 - **Location Auto-Detect:** Automatically find the user's location via IP address.
 - **Weather Alerts:** Warn users about storms, high UV, or rain.
