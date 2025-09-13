@@ -19,6 +19,10 @@ A minimal, themeable CLI weather tool for your terminal. Get beautifully display
 - **Terminal-Friendly** - Designed for a great experience in any terminal
 - **5-Day Forecast** - Extended weather forecast support
 
+![preview1_default](https://github.com/user-attachments/assets/ee910cef-501a-46c2-86cf-9628eaca5f44)
+![preview2_new_york_city_and_default_forecast](https://github.com/user-attachments/assets/8e72cd5d-1054-4a4a-a903-d634d4df24b3)
+
+
 ## Installation
 
 ### Quick Install (Recommended)
