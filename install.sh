@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION="1.2.6"
+VERSION="1.4.0"
 FILE="sunny-${VERSION}-py3-none-any.whl"
 URL="https://github.com/bremsstrahlung-57/sunny/releases/download/v${VERSION}/${FILE}"
 
