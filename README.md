@@ -13,7 +13,20 @@ A minimal, themeable CLI weather tool for your terminal. Get beautifully display
 
 ## Installation 📦
 
-The only way to install `sunny` for now is from the `.whl` file from the latest release.
+### One-Line Install (Recommended)
+
+```bash
+curl -sSL https://raw.githubusercontent.com/bremsstrahlung-57/sunny/master/install.sh | bash
+```
+This script will:
+- Download the latest release automatically
+- Install using pipx (if available) for a clean, isolated installation
+- Fall back to pip if pipx is not available
+- Clean up downloaded files automatically
+
+## Manual Installation
+
+The other way to install `sunny` for now is from the `.whl` file from the latest release.
 
 1.  **Download the `.whl` file** from the [latest release](https://github.com/bremsstrahlung-57/sunny/releases/latest).
 
