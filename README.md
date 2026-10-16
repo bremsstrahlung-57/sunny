@@ -2,7 +2,7 @@
 
 # Sunny 🌞
 
-[![version](https://img.shields.io/badge/version-1.5.0-blue)](https://github.com/bremsstrahlung-57/sunny/releases/tag/v1.4.0)
+[![version](https://img.shields.io/badge/version-1.5.0-blue)](https://github.com/bremsstrahlung-57/sunny/releases/tag/v1.5.0)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://python.org)
 
@@ -44,12 +44,12 @@ This script will automatically:
 
     **Using pipx (Recommended)**
     ```bash
-    pipx install sunny-1.4.0-py3-none-any.whl
+    pipx install sunny-1.5.0-py3-none-any.whl
     ```
 
     **Using pip**
     ```bash
-    pip install sunny-1.4.0-py3-none-any.whl
+    pip install sunny-1.5.0-py3-none-any.whl
     ```
 
 ## Configuration
