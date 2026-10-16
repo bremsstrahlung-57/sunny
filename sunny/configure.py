@@ -1,10 +1,8 @@
-import toml
-import sys
-import os
-import glob
 from pathlib import Path
-from rich import print
+
+import toml
 from platformdirs import user_config_dir
+from rich import box, print
 
 
 class ConfigManager:
@@ -198,45 +196,46 @@ Clouds = "purple3"
         }
 
     def setup_config(self):
-        """Setup config files"""
-        if not self.CONFIG_FILE.exists():
-            print(f"Creating a new configuration file for you...")
-            try:
-                self.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-                with open(self.CONFIG_FILE, "w") as f:
-                    f.write(self.DEFAULT_CONFIG)
-                self.THEMES_DIR.mkdir(exist_ok=True)
-                self.setup_themes()
-                print(f"✅ Configuration created at: {self.CONFIG_FILE}")
-                print("🛑 Please edit this file to add your OpenWeather API key.")
-                sys.exit(0)
-            except Exception as e:
-                print(f"Error creating configuration file: {e}")
-                sys.exit(1)
-        else:
+        """Create missing configuration and theme files without replacing user files."""
+        self.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+        try:
+            with self.CONFIG_FILE.open("x", encoding="utf-8") as f:
+                f.write(self.DEFAULT_CONFIG)
+        except FileExistsError:
             print(f"✅ Configuration exists at: {self.CONFIG_FILE}")
+        else:
+            print(f"✅ Configuration created at: {self.CONFIG_FILE}")
+            print("🛑 Please edit this file to add your OpenWeather API key.")
+        self.setup_themes()
 
     def setup_themes(self):
-        """Creates themes config files"""
-        if len(os.listdir(self.THEMES_DIR)) == 0:
+        """Create each missing built-in theme without replacing user files."""
+        self.THEMES_DIR.mkdir(parents=True, exist_ok=True)
+        for key, value in self.THEMES.items():
+            theme_file = self.THEMES_DIR / f"{key}.toml"
             try:
-                for counter, (key, value) in enumerate(self.THEMES.items()):
-                    with open(self.THEMES_FILES[counter], "w") as f:
-                        f.write(value)
-                    print(f"✅ Theme {key} created at: {self.THEMES_FILES[counter]}")
-            except Exception as e:
-                print(f"Error creating configuration theme file: {e}")
-                sys.exit(1)
-        else:
-            print(f"✅ Themes exists at: {self.THEMES_DIR}")
+                with theme_file.open("x", encoding="utf-8") as f:
+                    f.write(value)
+            except FileExistsError:
+                continue
+            print(f"✅ Theme {key} created at: {theme_file}")
 
     def _load_config(self) -> dict:
         """Load configuration data from file."""
         if not self.CONFIG_FILE.exists():
-            self.setup_config()
+            raise FileNotFoundError(
+                f"Configuration file not found: {self.CONFIG_FILE}. "
+                "Run 'sunny --init' to create it, then add your OpenWeather API key."
+            )
 
-        with self.CONFIG_FILE.open("r", encoding="utf-8") as f:
-            self._config_data = toml.load(f)
+        try:
+            with self.CONFIG_FILE.open("r", encoding="utf-8") as f:
+                self._config_data = toml.load(f)
+        except toml.TomlDecodeError as e:
+            raise ValueError(
+                f"Invalid TOML in configuration file {self.CONFIG_FILE}: {e}. "
+                "Correct the TOML syntax and try again."
+            ) from e
         return self._config_data
 
     @property
@@ -253,21 +252,34 @@ Clouds = "purple3"
 
     def get_theme_file(self):
         """Get the theme file path, falling back to sunny_dynamic if needed."""
-        if self._config_data == None:
-            self.config
-        defualt_theme = self._config_data.get("display").get("theme")
-        file = glob.glob(os.path.join(self.THEMES_DIR, f"{defualt_theme}.toml"))[0]
-        return file
+        theme_name = self.config.get("display", {}).get("theme", "sunny_dynamic")
+        theme_file = self.THEMES_DIR / f"{theme_name}.toml"
+        if not theme_file.is_file():
+            theme_file = self.THEMES_DIR / "sunny_dynamic.toml"
+        return str(theme_file)
+
+    def _merge_theme(self, theme_data):
+        """Fill missing theme attributes from the built-in default."""
+        defaults = toml.loads(self.THEMES["sunny_dynamic"])
+
+        # fixed: Merge nested colour tables so partial themes keep usable defaults.
+        def merge(defaults, overrides):
+            for key, value in overrides.items():
+                if isinstance(value, dict) and isinstance(defaults.get(key), dict):
+                    merge(defaults[key], value)
+                else:
+                    defaults[key] = value
+
+        merge(defaults, theme_data)
+        return defaults
 
     def _load_theme(self):
-        """Load theme data from file."""
-        theme_file = self.get_theme_file()
-        if not os.path.exists(theme_file):
-            print(f"Theme file not found: {theme_file}")
-            sys.exit(1)
-        with open(theme_file, "r", encoding="utf-8") as f:
-            theme_data = toml.load(f)
-            return theme_data
+        """Load a theme with built-in defaults, even when no theme file exists."""
+        theme_file = Path(self.get_theme_file())
+        if not theme_file.is_file():
+            return self._merge_theme({})
+        with theme_file.open("r", encoding="utf-8") as f:
+            return self._merge_theme(toml.load(f))
 
     @property
     def theme(self) -> dict:
@@ -279,37 +291,38 @@ Clouds = "purple3"
     @property
     def get_api_key(self) -> str:
         """Get API key from config."""
-        key_data = self.config
-
-        try:
-            return key_data.get("api").get("key")
-        except Exception as e:
-            print(f"API key not found in {self.CONFIG_FILE} file: {e}")
-            sys.exit(1)
+        key = self.config.get("api", {}).get("key", "")
+        if not isinstance(key, str):
+            raise ValueError(
+                f"Invalid API key in {self.CONFIG_FILE}; "
+                "set [api].key to a quoted string."
+            )
+        key = key.strip()
+        return "" if key == "YOUR-OPEN-WEATHER-API-KEY" else key
 
     @property
     def get_location(self) -> str:
         """Get default location from config."""
-        data = self.config
-        try:
-            return data.get("defaults").get("location")
-        except Exception as e:
-            print(
-                f"Error: Unable to retrieve default location from {self.CONFIG_FILE}. Please ensure the 'defaults' section with a 'location' key exists. Exception details: {e}"
+        location = self.config.get("defaults", {}).get("location", "")
+        if not isinstance(location, str):
+            raise ValueError(
+                f"Invalid location in {self.CONFIG_FILE}; "
+                "set [defaults].location to a quoted string."
             )
-            sys.exit(1)
+        return location.strip()
 
     @property
     def get_unit(self) -> str:
         """Get default units from config."""
-        data = self.config
-        try:
-            return data.get("defaults").get("units")
-        except Exception as e:
-            print(
-                f"Error: Unable to retrieve default units from {self.CONFIG_FILE}. Please ensure the [defaults] section with a 'units' key exists. Exception details: {e}"
+        unit = self.config.get("defaults", {}).get("units", "metric")
+        if isinstance(unit, str):
+            unit = unit.strip().lower()
+        if unit not in ("imperial", "metric"):
+            raise ValueError(
+                f"Invalid units {unit!r} in {self.CONFIG_FILE}; "
+                "set [defaults].units to 'imperial' or 'metric'."
             )
-            sys.exit(1)
+        return unit
 
     @property
     def city_colour(self) -> str:
@@ -323,8 +336,10 @@ Clouds = "purple3"
             )
             return "light_steel_blue"
 
-    def temp_colour(self, temperature: float) -> str:
-        """Get temperature color based on value."""
+    def temp_colour(self, temperature: float, units: str = "metric") -> str:
+        """Get temperature color using Celsius thresholds for either unit system."""
+        if units == "imperial":
+            temperature = (temperature - 32) * 5 / 9
         file_location = self.get_theme_file()
         try:
             if temperature > 30:
@@ -520,28 +535,14 @@ Clouds = "purple3"
         return self.theme.get("panel", {}).get(key)
 
     def get_box_style(self):
-        try:
-            from rich import box
-
-            box_style = self.theme.get("panel", {}).get("box").upper()
-            box_object = getattr(box, box_style)
-            return box_object
-        except AttributeError as e:
-            print(
-                f"Error getting box attribute value from config. [{self.get_theme_file()}]"
-            )
-            sys.exit(1)
+        box_style = self.theme.get("panel", {}).get("box", "ROUNDED")
+        box_object = getattr(box, str(box_style).upper(), box.ROUNDED)
+        return box_object if isinstance(box_object, box.Box) else box.ROUNDED
 
     def get_ascii_panel_attribute(self, key):
         return self.theme.get("ascii_panel", {}).get(key)
 
     def get_ascii_box_style(self):
-        try:
-            from rich import box
-
-            box_style = self.theme.get("ascii_panel", {}).get("box").upper()
-            box_object = getattr(box, box_style)
-            return box_object
-        except AttributeError as e:
-            print(f"Error getting box attribute value from {self.get_theme_file()}.")
-            sys.exit(1)
+        box_style = self.theme.get("ascii_panel", {}).get("box", "ROUNDED")
+        box_object = getattr(box, str(box_style).upper(), box.ROUNDED)
+        return box_object if isinstance(box_object, box.Box) else box.ROUNDED

@@ -1,207 +1,84 @@
 import toml
-from rich import print, box
+from rich import box, print
+from rich.console import Console, Group
 from rich.panel import Panel
-from rich.console import Console
-from rich.columns import Columns
-from pathlib import Path
-from platformdirs import user_config_dir
+from rich.text import Text
+
+from sunny.configure import ConfigManager
 
 
 def show_all_themes():
-    """Shows a preview of all themes"""
+    """Shows a preview of all themes without creating configuration files."""
     console = Console()
-    APP_NAME = "sunny"
-    themes_dir = Path(user_config_dir(APP_NAME)) / "themes"
-    theme_files = [f for f in themes_dir.iterdir() if f.name.endswith(".toml")]
+    config = ConfigManager()
+    theme_files = sorted(f for f in config.THEMES_DIR.glob("*.toml") if f.is_file())
+    themes = {}
+    if theme_files:
+        for theme_file in theme_files:
+            try:
+                with theme_file.open("r", encoding="utf-8") as f:
+                    themes[theme_file.stem] = toml.load(f)
+            except (OSError, toml.TomlDecodeError) as e:
+                console.print(
+                    f"Warning: Skipping theme {theme_file}: {e}", markup=False
+                )
+    else:
+        themes = {
+            name: toml.loads(template) for name, template in config.THEMES.items()
+        }
 
-    for theme_file in theme_files:
-        theme_path = themes_dir.joinpath(theme_file.name)
-        with theme_path.open("r", encoding="utf-8") as f:
-            theme = toml.load(f)
-        theme_name = theme_file.name.split(".")[0].capitalize()
+    for name, theme in themes.items():
+        theme = config._merge_theme(theme)
+        theme_name = name.capitalize()
         panel_config = theme.get("panel", {})
         border_style = panel_config.get("border_style", "bold")
-        box_attr = getattr(box, panel_config.get("box", "ROUNDED"))
+        box_attr = getattr(
+            box, str(panel_config.get("box", "ROUNDED")).upper(), box.ROUNDED
+        )
+        if not isinstance(box_attr, box.Box):
+            box_attr = box.ROUNDED
         border_colour = panel_config.get("border_colour", "light_steel_blue")
-        padding = (
-            int(panel_config.get("padding_top_right", 1)),
-            int(panel_config.get("padding_bottom_left", 1)),
-            int(panel_config.get("padding_top", 0)),
-            int(panel_config.get("padding_right", 0)),
-            int(panel_config.get("padding_bottom", 0)),
-            int(panel_config.get("padding_left", 0)),
+        width = min(int(panel_config.get("width", 55)), console.width)
+        colours = theme["colours"]
+        content = Group(
+            Text("Thunderstorm", style=colours["col_desc"]["Thunderstorm"]),
+            Text("Temp: 25(26) C", style=colours["col_temp"]["mid"]),
+            Text("Humidity: 65%", style=colours["col_humid"]["high"]),
+            Text("Wind: 3 m/s", style=colours["col_wind"]),
         )
-        width = int(panel_config.get("width", 55))
-        height = int(panel_config.get("height", 12))
-        city_colour = theme.get("colours").get("col_city")
-        wind_colour = theme.get("colours").get("col_wind")
-        temp_mid = theme.get("colours").get("col_temp").get("mid")
-        humd_high = theme.get("colours").get("col_humid").get("high")
-        Thunderstorm = theme.get("colours").get("col_desc").get("Thunderstorm")
-        content = Columns(
-            [
-                Panel(
-                    f"[{Thunderstorm}]Thunderstorm[/{Thunderstorm}]",
-                    box=box.MINIMAL,
-                ),
-                Panel(
-                    f"[{temp_mid}]Temp: 25(26) C[/{temp_mid}]",
-                    box=box.MINIMAL,
-                ),
-                Panel(
-                    f"[{humd_high}]Humidity: 65[/{humd_high}]",
-                    box=box.MINIMAL,
-                ),
-                Panel(
-                    f"[{wind_colour}]Wind: 3 m/s[/{wind_colour}]",
-                    box=box.MINIMAL,
-                ),
-            ]
-        )
-        PANEL = Panel(
+        # fixed: Natural height keeps wrapped preview text from being clipped.
+        panel = Panel(
             content,
-            title=f"[{city_colour}]{theme_name}[/{city_colour}]",
+            title=Text(theme_name, style=colours["col_city"]),
             border_style=f"{border_style} {border_colour}",
             box=box_attr,
-            padding=(
-                padding[0],
-                padding[1],
-            ),
+            padding=(1, 1),
             width=width,
-            height=height,
-            subtitle=f"Coord: (75.00, 32.00) Country: IN",
+            subtitle=Text("Coord: (75.00, 32.00) Country: IN"),
         )
-        console.print(PANEL)
-        console.print("\n\n")
+        console.print(panel)
+        console.print()
 
 
 def show_all_ascii():
-    """Shows a preview of all ascii arts of weather conditions"""
-    print(
-        f"1. Thunderstorm\n{r"""                    
-                    #####            
-               ....=########         
-             .......:########        
-            ............-######      
-          ...............*######     
-         ...................*##      
-          .....:+=...........        
-           ...:==+-........          
-               ==                    
-              =="""}",
+    """Shows a preview of all ascii arts of weather conditions."""
+    config = ConfigManager()
+    previews = (
+        ("Thunderstorm", "Thunderstorm", "11d"),
+        ("Drizzle", "Drizzle", "09d"),
+        ("Rain", "Rain", "10d"),
+        ("Snow", "Snow", "13d"),
+        ("Atmosphere", "Atmosphere", "50d"),
+        ("Clear Day", "Clear", "01d"),
+        ("Clear Night", "Clear", "01n"),
+        ("Few Clouds Day", "Clouds", "02d"),
+        ("Few Clouds Night", "Clouds", "02n"),
+        ("Scattered Clouds", "Clouds", "03n"),
+        ("Overcast Clouds", "Clouds", "04n"),
     )
-    print(
-        f"\n2. Drizzle\n{r"""       
-                  #####           
-             ......*######        
-             .........+#####      
-          .............:*###      
-          ...............         
-            ...#........          
-              #### #              
-                # ##"""}",
-    )
-    print(
-        f"\n3. Rain\n{r"""
-                 . =======        
-              .....:+======       
-             ..........+===       
-           .............:++       
-           ...............        
-            ...++........         
-               # ## #             
-                ## #"""}",
-    )
-    print(
-        f"\n4. Snow\n{r"""
-        ...        *                        *       *
-          ...   *         * ..   ...                        *
- *          ...        *           *            *
-              ...               ...                          *
-                ..                            *
-        *        ..        *                       *
-               __##____              *                      *
-  *        *  /  ##  ****                   *
-             /        ****               *         *  X   *
-   *        /        ******     *                    XXX      *
-           /___________*****          *             XXXXX
-            |            ***               *       XXXXXXX   X
-        *   | ___        |                    *   XXXXXXXX  XXX
-  *         | | |   ___  | *       *             XXXXXXXXXXXXXXX
-            | |_|   | |  ****             *           X   XXXXXXX
-        *********** | | *******      *                X      X
-****    ********************************************************"""}",
-    )
-    print(
-        f"\n5. Atmosphere\n{r"""
-               ######             
-            ##########            
-               #############      
-          #############           
-             #############        
-               ########"""}",
-    )
-    print(
-        f"\n6. Clear Day\n{r"""
-               ========           
-             ============         
-            ==============        
-            ===============       
-            ===============       
-            ==============        
-             ============+        
-               ========+"""}",
-    )
-    print(
-        f"\n7. Clear Night\n{r"""         
-               ########           
-             ############         
-            ##############        
-            ###############       
-            ###############       
-            ##############        
-             #############        
-               #########"""}",
-    )
-    print(
-        f"\n8. Few Clouds Day\n{r"""                             
-                      ==+         
-               ....+========      
-             .......=========     
-             ...........=====     
-          ..............-+===     
-         ..................-      
-         ...................      
-           ................"""}",
-    )
-    print(
-        f"\n9. Few Clouds Night\n{r"""
-                    ###         
-               ....#########      
-             .......#########     
-             ..........:#####     
-          ..............+####     
-         ..................=      
-         ...................      
-           ................"""}",
-    )
-    print(
-        f"\n10. Scattered Clouds\n{r"""
-               .....              
-              ........            
-            .............         
-          ..................      
-          ..................      
-           ................."""}",
-    )
-    print(
-        f"\n11. Overcast Clouds\n{r"""
-                    ##            
-               .. ######          
-             ......+#######       
-            ..........:######     
-         ..............-######    
-         .................*##     
-         ..................       
-          ................"""}",
-    )
+    # fixed: Reuse the art without config I/O or Python 3.12-only f-string syntax.
+    for index, (name, condition, icon) in enumerate(previews, 1):
+        if index > 1:
+            print()
+        print(f"{index}. {name}")
+        print(config.ascii_art(condition, icon))

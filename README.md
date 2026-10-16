@@ -2,12 +2,11 @@
 
 # Sunny 🌞
 
-[![version](https://img.shields.io/badge/version-1.4.0-blue)](https://github.com/bremsstrahlung-57/sunny/releases/tag/v1.4.0)
+[![version](https://img.shields.io/badge/version-1.5.0-blue)](https://github.com/bremsstrahlung-57/sunny/releases/tag/v1.5.0)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.7+-blue.svg)](https://python.org)
+[![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://python.org)
 
-<img src="https://github.com/user-attachments/assets/ee910cef-501a-46c2-86cf-9628eaca5f44" alt="preview1_default" width="300" height="200">
-<img src="https://github.com/user-attachments/assets/8e72cd5d-1054-4a4a-a903-d634d4df24b3" alt="preview2_new_york_city_and_default_forecast" width="300" height="200">
+<img width="670" height="359" alt="Screenshot 2026-10-16 183220" src="https://github.com/user-attachments/assets/22a8fb47-17c6-47d4-ae26-1251a153b7fb" />
 </div>
 
 A minimal, themeable CLI weather tool for your terminal. Get beautifully displayed weather information right where you need it.
@@ -19,7 +18,8 @@ A minimal, themeable CLI weather tool for your terminal. Get beautifully display
 - **ASCII Art** - Fun and informative ASCII art representing current weather conditions
 - **Essential Info** - Temperature (°C/°F), wind speed, and humidity
 - **Terminal-Friendly** - Designed for a great experience in any terminal
-- **5-Day Forecast** - Extended weather forecast support
+- **5-Day Forecast** - Daily cards with local times and forecast low/high temperatures
+- **Efficient Requests** - Shared current-weather requests and concurrent fetching when current weather and forecasts are both requested
 
 
 ## Installation
@@ -44,12 +44,12 @@ This script will automatically:
 
     **Using pipx (Recommended)**
     ```bash
-    pipx install sunny-1.4.0-py3-none-any.whl
+    pipx install sunny-1.5.0-py3-none-any.whl
     ```
 
     **Using pip**
     ```bash
-    pip install sunny-1.4.0-py3-none-any.whl
+    pip install sunny-1.5.0-py3-none-any.whl
     ```
 
 ## Configuration
@@ -60,7 +60,8 @@ This script will automatically:
     ```bash
     sunny --init
     ```
-    Follow the prompts to enter your API key and set a default location.
+    Edit the generated `config.toml` at the printed path to set `[api].key` and `[defaults].location`.
+    Running `--init` again restores missing built-in themes without overwriting your configuration or existing themes.
 
 ## Usage
 
@@ -68,8 +69,20 @@ This script will automatically:
 # Get weather for your default location
 sunny
 
-# Get weather for a specific city (use underscores for spaces)
-sunny -c New_York
+# Get weather for a specific city (underscores also work)
+sunny -c "New York"
+
+# Show only selected metrics (one weather request, no automatic forecast)
+sunny -t -y -d
+
+# Show daily forecast cards in Fahrenheit
+sunny --forecast -u imperial
+
+# Combine selected current conditions and forecasts (fetched concurrently)
+sunny -t --forecast
+
+# Preview themes without configuring an API key
+sunny --themes
 
 # Display help
 sunny -h
@@ -78,21 +91,18 @@ sunny -h
 sunny -v
 ```
 
+Set `[display].show_forecast = true` in `config.toml` to include forecasts alongside the default current-weather view. `[display].days` limits the forecast to 1–5 days. Daily cards use the sample closest to local noon; low/high values cover the available three-hour forecast samples, not full-day observations.
+
 ## Development
+
+With [uv](https://docs.astral.sh/uv/) installed:
 
 ```bash
 git clone https://github.com/bremsstrahlung-57/sunny.git
 cd sunny
-pip install -e .
+uv sync
+uv run sunny --help
 ```
-
-## Roadmap
-
-- [ ] More weather metrics (pressure, AQI)
-- [ ] Location auto-detection via IP
-- [ ] Weather alerts and warnings
-- [ ] Additional themes and languages
-- [ ] Multiple weather API support
 
 ## Contributing
 
