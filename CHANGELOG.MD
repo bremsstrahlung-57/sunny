@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-10-16
+
+### Added
+- Daily forecast low/high temperatures and location-local forecast times.
+- Support for `[display].show_forecast` and `[display].days` to customize the default forecast view.
+
+### Changed
+- Responsive weather cards and compact theme previews with automatic heights to prevent clipped content.
+- Reuse one current-weather response across selected outputs and fetch current weather and forecasts concurrently when both are requested.
+- Use HTTPS with connection/read timeouts and clearer API errors that do not expose the API key.
+
+### Fixed
+- Single-metric and ASCII-only commands no longer display an unintended forecast or full weather view.
+- `--version` exits without loading configuration or fetching weather.
+- Forecasts group three-hour samples by local date and select the sample nearest local noon instead of sampling at incorrect intervals.
+- City names with spaces or underscores are correctly encoded in API requests.
+- Configuration is loaded lazily without creating files during imports or read operations.
+- Re-running `--init` restores missing built-in themes without overwriting existing configuration or theme files.
+- Missing themes and partial custom themes fall back to built-in defaults; invalid box styles use a safe fallback.
+- Placeholder API keys, invalid units, malformed configuration, and incomplete weather responses produce clearer errors.
+- Temperature colors use the correct thresholds for Fahrenheit values.
+- Theme and ASCII previews work without configuration, and ASCII preview syntax supports Python 3.9.
+- Errors are written to stderr, and interrupted commands return exit code 130.
+
 ## [1.4.0] - 2025-09-13
 
 ### Added
