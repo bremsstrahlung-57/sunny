@@ -104,14 +104,6 @@ uv sync
 uv run sunny --help
 ```
 
-## Roadmap
-
-- [ ] More weather metrics (pressure, AQI)
-- [ ] Location auto-detection via IP
-- [ ] Weather alerts and warnings
-- [ ] Additional themes and languages
-- [ ] Multiple weather API support
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
